@@ -2,9 +2,11 @@
 const API_KEY = '0a233d84fc55a74ae5753ab6a5e22375';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
+
+// Movies
 export const getPopularMovies = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&language=es-ES`);
     if (!response.ok) {
       throw new Error('Error al obtener las películas populares');
     }
@@ -16,9 +18,25 @@ export const getPopularMovies = async () => {
   }
 };
 
+// Trending Movies
+export const getTrendingMovies = async () => {
+  try{
+    const response = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=es-ES`);
+    if (!response.ok){
+      throw new Error('Error al obtener las películas populares');
+    }
+    const data = await response.json();
+    return data.results;
+  } catch (error){
+    console.error('Error fetching trending movies:', error);
+    return [];
+  }
+}
+
+// Movie Details
 export const getMovieDetails = async (movieId) => {
   try {
-    const response = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}`);
+    const response = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES`);
     if (!response.ok) {
       throw new Error(`Error al obtener detalles de la película con ID ${movieId}`);
     }
@@ -29,3 +47,18 @@ export const getMovieDetails = async (movieId) => {
     return null;
   }
 };
+
+// TV series
+export const getPopularSeries = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}&language=es-ES`);
+    if (!response.ok){
+      throw new Error('Error al obtener las series populares');
+    }
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error('Error fetching popular series', error);
+    return [];
+  }
+}
