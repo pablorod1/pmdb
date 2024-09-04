@@ -5,25 +5,48 @@ import ChevronLeft from '../icons/ChevronLeft.astro';
 
 import SectionContainer from '../components/SectionContainer.astro';
 import ProgressSpinner from '../components/ProgressSpinner.astro';
+import MultipleGlide from '../components/MultipleGlide.astro';
 
-import { getPopularSeries, getPopularMovies, getTrendingMovies } from '../lib/tmdb';
+import { getPopularSeries, getPopularMovies, getTrendingMoviesWeek, getTrendingMoviesDay, getNowPlayingMovies, getMoviesWithVideos } from '../lib/tmdb';
 
 const popularMovies = await getPopularMovies();
-const trendingMovies = await getTrendingMovies();
+const trendingMoviesDay = await getTrendingMoviesDay();
+const trendingMoviesWeek = await getTrendingMoviesWeek();
+
+const nowPlayingMovies = await getMoviesWithVideos();
+// 5 Random movies from nowPlayingMovies
+const reducedMovies = nowPlayingMovies.sort(() => Math.random() - Math.random()).slice(0, 5);
+
+
+
 const carouselMovies = popularMovies.slice(0, 5);
 
 const popularSeries = await getPopularSeries();
 
-console.log(popularSeries);
+
 
 // format vote_average to %
 function formatVoteAverage(vote_average: number) {
 	vote_average = vote_average * 10;
 	return Math.round(vote_average);
 }
+
+function formatDate(date: string) {
+	const fecha = new Date(date);
+
+	const day = fecha.getDate();
+
+	const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+	const month = months[fecha.getMonth()];
+
+	const year = fecha.getFullYear();
+
+	return `${day} ${month} ${year}`;
+}
+
 ---
 
-<Layout title="Welcome to Astro.">
+<Layout title="PMDB">
 	<main>
 		<SectionContainer id="header" class="pb-10">
 			<div class="single-glide relative pb-20">
@@ -57,16 +80,41 @@ function formatVoteAverage(vote_average: number) {
 		</SectionContainer>
 
 		<SectionContainer id="trending-movies">
-			<div class="flex flex-col px-24">
-				<h1 class="flex text-white font-bold text-3xl">Tendencia</h1>
-				<div class="multiple-glide relative py-12">
+			<MultipleGlide title="Tendencias">
+				<div slot="btn-container" class="flex items-center justify-center rounded-full border-2 border-[var(--primary-color)] text-white">
+					<button id="day-btn" class="btn selected rounded-full py-1 px-4">Hoy</button>
+					<button id="week-btn" class="btn rounded-full py-1 px-4">Esta Semana</button>
+				</div>
+				<ul slot="glide-slides" class="glide__slides">				
+					{
+						trendingMoviesDay.map((movie: any, index:number) => (
+							<li class="glide__slide relative flex flex-col items-start justify-center gap-2">
+								<div class="flex items-center justify-center">
+									<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
+									<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
+								</div>
+								<div>
+									<h2 class="text-white text-sm">{movie.title}</h2>
+									<p class="text-gray-300 text-sm">{formatDate(movie.release_date)}</p>
+								</div>
+							</li>
+						))
+					}
+				</ul>
+			</MultipleGlide>
+		</SectionContainer>
+
+		<SectionContainer id="teasers">
+			<div class="bg-red-600 w-full py-24 h-full">
+				<h1 class="flex text-white font-bold text-3xl">Últimos Tráilers</h1>
+				<div class="teasers-glide relative pb-20">
 					<div class="glide__track mx-12" data-glide-el="track">
 						<ul class="glide__slides">
 							{
-							trendingMovies.map((movie: any, index: number) => (
-									<li class="glide__slide relative flex items-center justify-center">
-										<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
-										<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
+								reducedMovies.map((movie: any, index: number) => (
+									<li slot="slides" class="glide__slide w-fit">
+										<iframe width="400" height="200" src={`https://www.youtube.com/embed/${movie.videos[0].key}`}>
+										</iframe>
 									</li>
 								))
 							}
@@ -77,43 +125,45 @@ function formatVoteAverage(vote_average: number) {
 		</SectionContainer>
 
 		<SectionContainer id="popular-movies">
-			<div class="flex flex-col px-24">
-				<h1 class="flex text-white font-bold text-3xl">Películas Populares</h1>
-				<div class="multiple-glide relative py-12">
-					<div class="glide__track mx-12" data-glide-el="track">
-						<ul class="glide__slides">
-							{
-							popularMovies.map((movie: any, index: number) => (
-									<li class="glide__slide relative flex items-center justify-center">
-										<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
-										<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
-									</li>
-								))
-							}
-						</ul>
-					</div>
-				</div>
-			</div>
+			<MultipleGlide title="Películas Populares">
+				<ul slot="glide-slides" class="glide__slides">
+					{
+					popularMovies.map((movie: any, index: number) => (
+						<li slot="slides" class="glide__slide relative flex flex-col items-start justify-center gap-2">
+								<div class="flex items-center justify-center">
+									<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
+									<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
+								</div>
+								<div>
+									<h2 class="text-white text-sm">{movie.title}</h2>
+									<p class="text-gray-300 text-sm">{formatDate(movie.release_date)}</p>
+								</div>
+							</li>
+						))
+					}
+				</ul>
+			</MultipleGlide>			
 		</SectionContainer>
 
 		<SectionContainer id="popular-series">
-			<div class="flex flex-col px-24">
-				<h1 class="text-white font-bold text-3xl">Series Populares</h1>
-				<div class="multiple-glide py-12">
-					<div class="glide__track mx-12" data-glide-el="track">
-						<ul class="glide__slides">
-							{
-							popularSeries.map((serie: any, index: number) => (
-										<li class="glide__slide relative flex items-center justify-center">
-											<img class="w-full" src={`https://image.tmdb.org/t/p/original${serie.poster_path}`} loading="lazy" />
-											<ProgressSpinner id={`serie-${index}`} percent={formatVoteAverage(serie.vote_average)}/>
-										</li>
-								))
-							}
-						</ul>
-					</div>
-				</div>
-			</div>
+			<MultipleGlide title="Series Populares">
+				<ul slot="glide-slides" class="glide__slides">
+					{
+					popularSeries.map((serie: any, index: number) => (
+							<li slot="slides" class="glide__slide relative flex flex-col items-start justify-center gap-2">
+								<div class="flex items-center justify-center">
+									<img class="w-full" src={`https://image.tmdb.org/t/p/original${serie.poster_path}`} loading="lazy" />
+									<ProgressSpinner id={`serie-${index}`} percent={formatVoteAverage(serie.vote_average)}/>
+								</div>
+								<div>
+									<h2 class="text-white text-sm">{serie.title}</h2>
+									<p class="text-gray-300 text-sm">{formatDate(serie.release_date)}</p>
+								</div>
+							</li>
+						))
+					}
+				</ul>
+			</MultipleGlide>
 		</SectionContainer>
 	</main>
 </Layout>
@@ -181,7 +231,7 @@ function formatVoteAverage(vote_average: number) {
 		transition: opacity 0.3s ease, transform 0.3s ease;
 	}
 	.multiple-glide .glide__slide:not(.glide__slide--active){
-		opacity: 0.5;
+		opacity: 0.8;
 		transform: scale(1);
 	}
 	.multiple-glide .glide__slide--active{
@@ -206,9 +256,38 @@ function formatVoteAverage(vote_average: number) {
 		transform: scale(0.6) translate(-60%, 120%);
 	}
 
+	
+	.btn.selected{
+		background-color: var(--primary-color);
+		color: #13151a;
+		font-weight: 600;
+	}
+
+	.hidden{
+		display: none;
+	}
+
+
+
 </style>
 
 <script>
   import "../lib/carousel.js";
+
+	const dayBtn = document.getElementById('day-btn');
+  const weekBtn = document.getElementById('week-btn');
+
+  if (dayBtn && weekBtn) {
+    dayBtn.addEventListener('click', () => {
+      dayBtn.classList.add('selected');
+      weekBtn.classList.remove('selected');
+    });
+
+    weekBtn.addEventListener('click', () => {
+      dayBtn.classList.remove('selected');
+      weekBtn.classList.add('selected');
+		});
+  }
+	
 </script>
 

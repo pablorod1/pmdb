@@ -33,5 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }).mount();
   });
 
+  const teasersGlide = new Glide(".teasers-glide", {
+    type: "carousel",
+    perView: 10,
+    gap: 5,
+  });
+
   singleGlide.mount();
 });

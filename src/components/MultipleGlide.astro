@@ -1,0 +1,15 @@
+---
+const { title, className } = Astro.props;
+
+---
+<div class="flex flex-col px-24">
+  <div class="flex items-center gap-8">
+    <h1 class="flex text-white font-bold text-3xl">{title}</h1>
+    <slot name="btn-container"/>
+  </div>
+  <div class="multiple-glide relative py-12">
+    <div class="glide__track mx-12" data-glide-el="track">
+      <slot name="glide-slides"/>
+    </div>
+  </div>
+</div>
