@@ -12,7 +12,7 @@ const { items, title } = Astro.props
         items.map((item: any) => {
           return (
             <li class="glide__slide rounded-lg overflow-hidden">
-              <img class="w-full max-h-[540px] h-full object-cover" src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`} alt="" />
+              <img class="w-full max-h-[540px] h-full object-cover object-top" src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`} alt="" />
             </li>
           )
         })
