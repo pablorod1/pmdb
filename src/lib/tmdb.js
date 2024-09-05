@@ -66,7 +66,7 @@ export const getNowPlayingMovies = async () => {
 export const getMoviesWithVideos = async () => {
   try {
     // Paso 1: Obtener películas en los cines
-    const nowPlayingMovies = await getNowPlayingMovies();
+    const nowPlayingMovies = await getUpcomingMovies();
 
     // Paso 2: Filtrar películas con videos
     const moviesWithVideosPromises = nowPlayingMovies.map(async (movie) => {
@@ -76,7 +76,6 @@ export const getMoviesWithVideos = async () => {
           throw new Error('Error al obtener los videos de la película');
         }
         const videoData = await videoResponse.json();
-        console.log(`Videos found for movie ID ${movie.id}:`, videoData.results);
         if (videoData.results.length > 0) {
           return { ...movie, videos: videoData.results };
         }
@@ -94,6 +93,36 @@ export const getMoviesWithVideos = async () => {
     return moviesWithVideos.filter(movie => movie !== null);
   } catch (error) {
     console.error('Error fetching movies with videos:', error);
+    return [];
+  }
+};
+
+// Top Rated Movies
+export const getTopRatedMovies = async () => {
+  try{
+    const response = await fetch(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=es-ES`);
+    if (!response.ok){
+      throw new Error('Error al obtener las películas: ');
+    }
+    const data = await response.json();
+    return data.results;
+  } catch (error){
+    console.error('Error fetching trending movies:', error);
+    return [];
+  }
+};
+
+// Upcoming Movies
+export const getUpcomingMovies = async () => {
+  try{
+    const response = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=es-ES`);
+    if (!response.ok){
+      throw new Error('Error al obtener las películas: ');
+    }
+    const data = await response.json();
+    return data.results;
+  } catch (error){
+    console.error('Error fetching trending movies:', error);
     return [];
   }
 };

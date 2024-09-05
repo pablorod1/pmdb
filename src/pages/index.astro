@@ -1,293 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ChevronRight from '../icons/ChevronRight.astro';
-import ChevronLeft from '../icons/ChevronLeft.astro';
 
-import SectionContainer from '../components/SectionContainer.astro';
-import ProgressSpinner from '../components/ProgressSpinner.astro';
-import MultipleGlide from '../components/MultipleGlide.astro';
+import GlideSlider from '../components/GlideSlider.astro';
+import VideoModal from '../components/VideoModal.astro';
 
-import { getPopularSeries, getPopularMovies, getTrendingMoviesWeek, getTrendingMoviesDay, getNowPlayingMovies, getMoviesWithVideos } from '../lib/tmdb';
+import '../styles/global.css';
 
-const popularMovies = await getPopularMovies();
-const trendingMoviesDay = await getTrendingMoviesDay();
-const trendingMoviesWeek = await getTrendingMoviesWeek();
+import * as tmdb from '../lib/tmdb';
 
-const nowPlayingMovies = await getMoviesWithVideos();
-// 5 Random movies from nowPlayingMovies
-const reducedMovies = nowPlayingMovies.sort(() => Math.random() - Math.random()).slice(0, 5);
+const nowPlayingMovies = await tmdb.getNowPlayingMovies();
+const popularMovies = await tmdb.getPopularMovies();
+const trendingMoviesDay = await tmdb.getTrendingMoviesDay();
+const trendingMoviesWeek = await tmdb.getTrendingMoviesWeek();
 
 
-
-const carouselMovies = popularMovies.slice(0, 5);
-
-const popularSeries = await getPopularSeries();
-
-
-
-// format vote_average to %
-function formatVoteAverage(vote_average: number) {
-	vote_average = vote_average * 10;
-	return Math.round(vote_average);
-}
-
-function formatDate(date: string) {
-	const fecha = new Date(date);
-
-	const day = fecha.getDate();
-
-	const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-	const month = months[fecha.getMonth()];
-
-	const year = fecha.getFullYear();
-
-	return `${day} ${month} ${year}`;
-}
+const popularSeries = await tmdb.getPopularSeries();
 
 ---
 
-<Layout title="PMDB">
+<Layout title="Inicio">
 	<main>
-		<SectionContainer id="header" class="pb-10">
-			<div class="single-glide relative pb-20">
-				<div class="glide__track mx-12" data-glide-el="track">
-					<ul class="glide__slides">
-						{
-							carouselMovies.map((movie: any) => {
-								return (
-									<li class="glide__slide ">
-										<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`} alt="" />
-									</li>
-								)
-							})
-						}
-					</ul>
-				</div>
-		
-				<div class="glide__arrows" data-glide-el="controls">
-					<button class="glide__arrow glide__arrow--left " data-glide-dir="<" style="border: 0;"><ChevronLeft class="size-14"/></button>
-					<button class="glide__arrow glide__arrow--right " data-glide-dir=">" style="border: 0;"><ChevronRight class="size-14"/></button>
-				</div>
-		
-				<div class="glide__bullets" data-glide-el="controls[nav]">
-					{
-						carouselMovies.map((movie: any, index: number) => (
-							<button class="glide__bullet" data-glide-dir={`=${index}`}></button>
-						))
-					}
-				</div>
-			</div>
-		</SectionContainer>
+		<GlideSlider title="Películas Populares" items={nowPlayingMovies} typeSlider="single" />
 
-		<SectionContainer id="trending-movies">
-			<MultipleGlide title="Tendencias">
-				<div slot="btn-container" class="flex items-center justify-center rounded-full border-2 border-[var(--primary-color)] text-white">
-					<button id="day-btn" class="btn selected rounded-full py-1 px-4">Hoy</button>
-					<button id="week-btn" class="btn rounded-full py-1 px-4">Esta Semana</button>
-				</div>
-				<ul slot="glide-slides" class="glide__slides">				
-					{
-						trendingMoviesDay.map((movie: any, index:number) => (
-							<li class="glide__slide relative flex flex-col items-start justify-center gap-2">
-								<div class="flex items-center justify-center">
-									<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
-									<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
-								</div>
-								<div>
-									<h2 class="text-white text-sm">{movie.title}</h2>
-									<p class="text-gray-300 text-sm">{formatDate(movie.release_date)}</p>
-								</div>
-							</li>
-						))
-					}
-				</ul>
-			</MultipleGlide>
-		</SectionContainer>
+		<GlideSlider title="Tendencias" items={trendingMoviesDay} btnContainer={true} typeSlider="multiple"/>
 
-		<SectionContainer id="teasers">
-			<div class="bg-red-600 w-full py-24 h-full">
-				<h1 class="flex text-white font-bold text-3xl">Últimos Tráilers</h1>
-				<div class="teasers-glide relative pb-20">
-					<div class="glide__track mx-12" data-glide-el="track">
-						<ul class="glide__slides">
-							{
-								reducedMovies.map((movie: any, index: number) => (
-									<li slot="slides" class="glide__slide w-fit">
-										<iframe width="400" height="200" src={`https://www.youtube.com/embed/${movie.videos[0].key}`}>
-										</iframe>
-									</li>
-								))
-							}
-						</ul>
-					</div>
-				</div>
-			</div>
-		</SectionContainer>
+		<GlideSlider title="Películas en Cartelera" typeSlider="video"/>
 
-		<SectionContainer id="popular-movies">
-			<MultipleGlide title="Películas Populares">
-				<ul slot="glide-slides" class="glide__slides">
-					{
-					popularMovies.map((movie: any, index: number) => (
-						<li slot="slides" class="glide__slide relative flex flex-col items-start justify-center gap-2">
-								<div class="flex items-center justify-center">
-									<img class="w-full" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} loading="lazy" />
-									<ProgressSpinner id={`movie-${index}`} percent={formatVoteAverage(movie.vote_average)}/>
-								</div>
-								<div>
-									<h2 class="text-white text-sm">{movie.title}</h2>
-									<p class="text-gray-300 text-sm">{formatDate(movie.release_date)}</p>
-								</div>
-							</li>
-						))
-					}
-				</ul>
-			</MultipleGlide>			
-		</SectionContainer>
+		<GlideSlider title="Películas Populares" items={popularMovies} typeSlider="multiple"/>
 
-		<SectionContainer id="popular-series">
-			<MultipleGlide title="Series Populares">
-				<ul slot="glide-slides" class="glide__slides">
-					{
-					popularSeries.map((serie: any, index: number) => (
-							<li slot="slides" class="glide__slide relative flex flex-col items-start justify-center gap-2">
-								<div class="flex items-center justify-center">
-									<img class="w-full" src={`https://image.tmdb.org/t/p/original${serie.poster_path}`} loading="lazy" />
-									<ProgressSpinner id={`serie-${index}`} percent={formatVoteAverage(serie.vote_average)}/>
-								</div>
-								<div>
-									<h2 class="text-white text-sm">{serie.title}</h2>
-									<p class="text-gray-300 text-sm">{formatDate(serie.release_date)}</p>
-								</div>
-							</li>
-						))
-					}
-				</ul>
-			</MultipleGlide>
-		</SectionContainer>
+		<GlideSlider title="Series Populares" items={popularSeries} typeSlider="multiple"/>
+
+		<!-- Teaser Player Dialog -->
+		<VideoModal />
+
+
 	</main>
 </Layout>
 
-<style is:global>
-	/* Single Glide Carousel */
-	.single-glide .glide__track{
-		overflow: visible !important;
-	}
-	.single-glide .glide__arrows{
-		opacity: 0;
-		transition: opacity 0.3s;
-	}
-	.single-glide:hover .glide__arrows{
-		opacity: 1;
-	}
-	.single-glide .glide__slide:not(.glide__slide--active){
-		transition: opacity 0.3s ease;
-	}
-	.single-glide .glide__slide{
-		border-radius: .5rem;
-		overflow: hidden;
-	}
-	.single-glide .glide__slide img{
-		width: 100%;
-		object-fit: cover;
-		max-height: 540px;
-		height: 100%;
-	}
-	.single-glide .glide__slide--active{	
-		border: 2px solid transparent;
-		box-shadow: rgba(0, 0, 0, 0.8) 0px 26px 30px , rgba(0, 0, 0,1) 0px 16px 10px -10px;
-		transition: border 0.2s ease, opacity 0.2s ease, box-shadow 0.3s ease;
-	}
-	.single-glide .glide__slide--active:hover{
-		border: 2px solid white;
-	}
-	.single-glide .glide__arrow--left{
-		left: -.5rem !important;
-	}
-	.single-glide .glide__arrow--right{
-		right: -1rem !important;
-	}
-	.single-glide .glide__slide:not(.glide__slide--active){
-		opacity: 0.5;
-	}
-	.single-glide .glide__slides{
-		overflow: visible !important;
-	}
-
-	/* Multiple Glide Carousel */
-	.multiple-glide .glide__track{
-		overflow: visible !important;
-	}
-	.multiple-glide .glide__slide{
-		border-radius: .5rem;
-		overflow: hidden;
-	}
-	.multiple-glide .glide__slide img{
-		width: 100%;
-		object-fit: cover;
-	}
-	.multiple-glide .glide__slide{
-		position: relative;
-		transition: opacity 0.3s ease, transform 0.3s ease;
-	}
-	.multiple-glide .glide__slide:not(.glide__slide--active){
-		opacity: 0.8;
-		transform: scale(1);
-	}
-	.multiple-glide .glide__slide--active{
-		opacity: 1;
-		transform: scale(1.1);
-	}
-	.multiple-glide .glide__slides{
-		overflow: visible !important;
-	}
-	.multiple-glide .glide__arrow{
-		position: absolute;
-		box-shadow: none;
-	}
-	.multiple-glide .glide__slide--active:hover .progress-spinner-container{
-		opacity: 1;
-	}
-	.multiple-glide .glide__slide--active:hover img{
-		filter: brightness(0.8) blur(1px);
-	}
-	.multiple-glide .glide__slide:not(.glide__slide--active) .progress-spinner-container{
-		opacity: 1;
-		transform: scale(0.6) translate(-60%, 120%);
-	}
-
-	
-	.btn.selected{
-		background-color: var(--primary-color);
-		color: #13151a;
-		font-weight: 600;
-	}
-
-	.hidden{
-		display: none;
-	}
-
-
-
-</style>
 
 <script>
   import "../lib/carousel.js";
-
-	const dayBtn = document.getElementById('day-btn');
-  const weekBtn = document.getElementById('week-btn');
-
-  if (dayBtn && weekBtn) {
-    dayBtn.addEventListener('click', () => {
-      dayBtn.classList.add('selected');
-      weekBtn.classList.remove('selected');
-    });
-
-    weekBtn.addEventListener('click', () => {
-      dayBtn.classList.remove('selected');
-      weekBtn.classList.add('selected');
-		});
-  }
-	
 </script>
 

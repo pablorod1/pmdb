@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       perView: 10,
       gap: 30,
       breakpoints: {
-        1200: {
+        1600: {
           perView: 5,
         },
         1024: {
@@ -35,9 +35,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const teasersGlide = new Glide(".teasers-glide", {
     type: "carousel",
-    perView: 10,
-    gap: 5,
+    perView: 5,
+    gap: 40,
+    breakpoints: {
+      1200: {
+        perView: 1,
+      },
+      1024: {
+        perView: 2,
+      },
+      768: {
+        perView: 1,
+      },
+    }
   });
 
   singleGlide.mount();
+  teasersGlide.mount();
 });

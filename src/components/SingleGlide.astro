@@ -1,0 +1,35 @@
+---
+import ChevronRight from "../icons/ChevronRight.astro"
+import ChevronLeft from "../icons/ChevronLeft.astro"
+
+const { items, title } = Astro.props
+---
+
+<div class="single-glide group relative pb-20">
+  <div class="glide__track mx-12 !overflow-visible" data-glide-el="track">
+    <ul class="glide__slides !overflow-visible">
+      {
+        items.map((item: any) => {
+          return (
+            <li class="glide__slide rounded-lg overflow-hidden">
+              <img class="w-full max-h-[540px] h-full object-cover" src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`} alt="" />
+            </li>
+          )
+        })
+      }
+    </ul>
+  </div>
+
+  <div class="glide__arrows opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" data-glide-el="controls">
+    <button class="glide__arrow glide__arrow--left " data-glide-dir="<" style="border: 0;"><ChevronLeft class="size-14"/></button>
+    <button class="glide__arrow glide__arrow--right " data-glide-dir=">" style="border: 0;"><ChevronRight class="size-14"/></button>
+  </div>
+
+  <div class="glide__bullets" data-glide-el="controls[nav]">
+    {
+      items.map((index: number) => (
+        <button class="glide__bullet" data-glide-dir={`=${index}`}></button>
+      ))
+    }
+  </div>
+</div>

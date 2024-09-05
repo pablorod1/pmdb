@@ -1,0 +1,29 @@
+---
+import MultipleGlide from './MultipleGlide.astro';
+import SectionContainer from './SectionContainer.astro';
+import MovieCard from './MovieCard.astro';
+import SingleGlide from './SingleGlide.astro';
+import VideoSlider from './VideoSlider.astro';
+// GlideSlider.astro
+const { title, items, btnContainer, typeSlider } = Astro.props;
+---
+
+<SectionContainer id={title.toLowerCase().replace(/\s+/g, '-')}>
+  {
+    typeSlider === 'single' ? (
+      <SingleGlide items={items} title={title} />
+    ) : typeSlider === 'multiple' ? (
+      <MultipleGlide title={title} btnContainer={btnContainer}>
+        <ul slot="glide-slides" class="glide__slides">
+          {items.map((item: any, index: number) => (
+            <li slot="slides" class="glide__slide h-full">
+              <MovieCard {...item} id={index} />
+            </li>
+          ))}
+        </ul>
+      </MultipleGlide>
+    ) : typeSlider === 'video' ? (
+      <VideoSlider title={title} />
+    ) : null
+  }
+</SectionContainer>

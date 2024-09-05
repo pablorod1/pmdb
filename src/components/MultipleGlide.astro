@@ -1,11 +1,16 @@
 ---
-const { title, className } = Astro.props;
+const { title, btnContainer } = Astro.props;
 
 ---
-<div class="flex flex-col px-24">
-  <div class="flex items-center gap-8">
+<div class="flex flex-col ps-4 lg:px-24">
+  <div class="flex items-center gap-4 lg:gap-8">
     <h1 class="flex text-white font-bold text-3xl">{title}</h1>
-    <slot name="btn-container"/>
+    {btnContainer ? <div slot="btn-container" class="flex items-center justify-center rounded-full border-2 border-[var(--primary-color)] text-white">
+      <button id="day-btn" class="btn selected rounded-full py-1 px-4 text-xs lg:text-lg">Hoy</button>
+      <button id="week-btn" class="btn rounded-full py-1 px-4 text-xs lg:text-lg">Esta Semana</button>
+    </div>
+    : null
+    }
   </div>
   <div class="multiple-glide relative py-12">
     <div class="glide__track mx-12" data-glide-el="track">
@@ -13,3 +18,21 @@ const { title, className } = Astro.props;
     </div>
   </div>
 </div>
+
+<script>
+
+  const dayBtn = document.getElementById('day-btn');
+  const weekBtn = document.getElementById('week-btn');
+  
+  if (dayBtn && weekBtn) {
+    dayBtn.addEventListener('click', () => {
+      dayBtn.classList.add('selected');
+      weekBtn.classList.remove('selected');
+    });
+
+    weekBtn.addEventListener('click', () => {
+      dayBtn.classList.remove('selected');
+      weekBtn.classList.add('selected');
+		});
+  }
+</script>
