@@ -1,12 +1,12 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from '@layouts/Layout.astro';
 
-import GlideSlider from '../components/Sliders/GlideSlider.astro';
-import VideoModal from '../components/UI/VideoModal.astro';
+import GlideSlider from '@components/Sliders/GlideSlider.astro';
+import VideoModal from '@components/UI/VideoModal.astro';
 
-import '../styles/global.css';
+import '@styles/global.css';
 
-import * as tmdb from '../lib/tmdb';
+import * as tmdb from '@lib/tmdb';
 
 const nowPlayingMovies = await tmdb.getNowPlayingMovies(1);
 const popularMovies = await tmdb.getPopularMovies(1);
@@ -32,13 +32,11 @@ const popularSeries = await tmdb.getPopularSeries();
 
 		<!-- Teaser Player Dialog -->
 		<VideoModal />
-
-
 	</main>
 </Layout>
 
 
 <script>
-  import "../lib/carousel.js";
+  import "@lib/carousel.js";
 </script>
 

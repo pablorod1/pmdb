@@ -4,7 +4,7 @@ import SectionContainer from '../SectionContainer.astro';
 import MovieCard from '../MovieCard.astro';
 import SingleGlide from './SingleGlide.astro';
 import VideoSlider from './VideoSlider.astro';
-// GlideSlider.astro
+
 const { title, items, btnContainer, typeSlider } = Astro.props;
 ---
 
@@ -13,7 +13,7 @@ const { title, items, btnContainer, typeSlider } = Astro.props;
     typeSlider === 'single' ? (
       <SingleGlide items={items} title={title} />
     ) : typeSlider === 'multiple' ? (
-      <MultipleGlide title={title} btnContainer={btnContainer}>
+      <MultipleGlide title={title} btnContainer={btnContainer} className="ps-4 lg:px-24">
         <ul slot="glide-slides" class="glide__slides">
           {items.map((item: any) => (
             <li slot="slides" class="glide__slide h-full">
@@ -24,6 +24,22 @@ const { title, items, btnContainer, typeSlider } = Astro.props;
       </MultipleGlide>
     ) : typeSlider === 'video' ? (
       <VideoSlider title={title} />
+    ) : typeSlider === 'cast' ? (
+      <MultipleGlide title={title} btnContainer={btnContainer}>
+        <ul slot="glide-slides" class="glide__slides">
+          {
+            items.map((item: any) => (
+              <li slot="slides" class="glide__slide h-full">
+                <div class="flex flex-col justify-center items-center">
+                  <img class="w-20 rounded-full" src={`https://image.tmdb.org/t/p/original${item.profile_path}`} alt={item.name} />
+                  <span class="text-white text-sm">{item.name}</span>
+                  <span class="text-gray-400 text-xs">{item.character.split('/', [1])}</span>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </MultipleGlide>
     ) : null
   }
 </SectionContainer>

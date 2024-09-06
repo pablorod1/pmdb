@@ -20,7 +20,7 @@ function formatRating(rating) {
   return rating.toFixed(1);
 }
 
-function formatVotes(votes) {
+export function formatVotes(votes) {
   if (votes >= 1000000) {
     return `${(votes / 1000000).toFixed(1)}M`;
   } else {

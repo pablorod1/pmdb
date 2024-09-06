@@ -27,7 +27,7 @@ const color = getColor(percent);
 
 ---
 
-<div class="progress-spinner-container">
+<div class={`progress-spinner-container ${className}`}>
   <div class="progress-spinner" style={`width: ${size}px; height: ${size}px;`}>
     <svg viewBox={`0 0 ${size} ${size}`}>
       <circle
@@ -90,7 +90,7 @@ const color = getColor(percent);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: .9rem;
+    font-size: 1.4rem;
     font-weight: bold;
     color: var(--color);
   }
