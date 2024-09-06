@@ -1,0 +1,19 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { getTopRatedMovies } from "@lib/tmdb";
+import  MovieList  from "@components/MovieList.jsx";
+
+// Obtén las primeras películas en el lado del servidor
+const initialMovies = await getTopRatedMovies(1);
+// Order by vote average
+initialMovies.movies.sort((a: any, b: any) => b.vote_average - a.vote_average);
+---
+
+<Layout title="Películas">
+  <main>     
+      {/* Renderiza el componente de React */}
+      <MovieList initialMovies={initialMovies} initialType={'top-rated'} client:load />
+  </main>
+</Layout>
+
+

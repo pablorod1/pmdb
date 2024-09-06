@@ -1,17 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-import GlideSlider from '../components/GlideSlider.astro';
-import VideoModal from '../components/VideoModal.astro';
+import GlideSlider from '../components/Sliders/GlideSlider.astro';
+import VideoModal from '../components/UI/VideoModal.astro';
 
 import '../styles/global.css';
 
 import * as tmdb from '../lib/tmdb';
 
-const nowPlayingMovies = await tmdb.getNowPlayingMovies();
-const popularMovies = await tmdb.getPopularMovies();
-const trendingMoviesDay = await tmdb.getTrendingMoviesDay();
-const trendingMoviesWeek = await tmdb.getTrendingMoviesWeek();
+const nowPlayingMovies = await tmdb.getNowPlayingMovies(1);
+const popularMovies = await tmdb.getPopularMovies(1);
+const trendingMoviesDay = await tmdb.getTrendingMoviesDay(1);
+const trendingMoviesWeek = await tmdb.getTrendingMoviesWeek(1);
 
 
 const popularSeries = await tmdb.getPopularSeries();
@@ -20,13 +20,13 @@ const popularSeries = await tmdb.getPopularSeries();
 
 <Layout title="Inicio">
 	<main>
-		<GlideSlider title="Películas Populares" items={nowPlayingMovies} typeSlider="single" />
+		<GlideSlider title="Películas Populares" items={nowPlayingMovies.movies} typeSlider="single" />
 
-		<GlideSlider title="Tendencias" items={trendingMoviesDay} btnContainer={true} typeSlider="multiple"/>
+		<GlideSlider title="Tendencias Esta Semana" items={trendingMoviesWeek.movies} typeSlider="multiple"/>
 
 		<GlideSlider title="Películas en Cartelera" typeSlider="video"/>
 
-		<GlideSlider title="Películas Populares" items={popularMovies} typeSlider="multiple"/>
+		<GlideSlider title="Películas Populares" items={popularMovies.movies} typeSlider="multiple"/>
 
 		<GlideSlider title="Series Populares" items={popularSeries} typeSlider="multiple"/>
 

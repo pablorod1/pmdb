@@ -1,11 +1,10 @@
 ---
-import { getMoviesWithVideos } from "../lib/tmdb"
-import PlayIcon from "../icons/PlayIcon.astro";
-import DotsCircleIcon from "../icons/DotsCircleIcon.astro";
+import { getMoviesWithVideos } from "../../lib/tmdb"
+import PlayIcon from "../../icons/PlayIcon.astro";
+import DotsCircleIcon from "../../icons/DotsCircleIcon.astro";
 
 const nowPlayingMovies = await getMoviesWithVideos();
 nowPlayingMovies.sort((a: any, b: any) => b.popularity - a.popularity);
-console.log(nowPlayingMovies[0]);
 
 const {title} = Astro.props;
 ---
@@ -38,12 +37,10 @@ const {title} = Astro.props;
 </div>
 
 <script>
-  import { getMoviesWithVideos } from '../lib/tmdb';
+  import { getMoviesWithVideos } from '../../lib/tmdb';
 	
 	const nowPlayingMovies = await getMoviesWithVideos();
 	nowPlayingMovies.sort((a: any, b: any) => b.popularity - a.popularity);
-	console.log(nowPlayingMovies[0]);
-
 
 	const teasersContainer = document.getElementById('teasers-container');
 	const teasers = teasersContainer?.querySelectorAll('[id^="movie-"]');

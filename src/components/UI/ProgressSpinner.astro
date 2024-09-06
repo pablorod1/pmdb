@@ -3,7 +3,6 @@ interface Props {
   percent: number;
   size?: number;
   strokeWidth?: number;
-  id: string;
   className?: string;
 }
 
@@ -11,7 +10,6 @@ const {
   percent,
   size = 80,
   strokeWidth = 4,
-  id,
   className
 } = Astro.props;
 
@@ -29,7 +27,7 @@ const color = getColor(percent);
 
 ---
 
-<div id={id} class="progress-spinner-container">
+<div class="progress-spinner-container">
   <div class="progress-spinner" style={`width: ${size}px; height: ${size}px;`}>
     <svg viewBox={`0 0 ${size} ${size}`}>
       <circle

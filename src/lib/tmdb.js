@@ -1,75 +1,104 @@
-// src/lib/tmdb.js
 const API_KEY = '0a233d84fc55a74ae5753ab6a5e22375';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-
-// Movies
-export const getPopularMovies = async () => {
+// Obtiene todos los géneros
+const getGenres = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&language=es-ES`);
+    const response = await fetch(`${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=es-ES`);
     if (!response.ok) {
-      throw new Error('Error al obtener las películas populares');
+      throw new Error('Error al obtener los géneros');
     }
     const data = await response.json();
-    return data.results;
+    return data.genres;
   } catch (error) {
-    console.error('Error fetching popular movies:', error);
+    console.error('Error fetching genres:', error);
     return [];
   }
 };
 
-// Trending Movies Week
-export const getTrendingMoviesWeek = async () => {
-  try{
-    const response = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
+// Asocia géneros a las películas
+const associateGenresToMovies = async (movies) => {
+  try {
+    const genres = await getGenres();
+    return movies.map(movie => ({
+      ...movie,
+      genres: movie.genre_ids.map(id => genres.find(genre => genre.id === id)).filter(genre => genre !== undefined)
+    }));
+  } catch (error) {
+    console.error('Error associating genres to movies:', error);
+    return movies;
+  }
+};
+
+// Películas Populares
+export const getPopularMovies = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
       throw new Error('Error al obtener las películas populares');
     }
     const data = await response.json();
-    return data.results;
-  } catch (error){
-    console.error('Error fetching trending movies:', error);
-    return [];
+    const movies = await associateGenresToMovies(data.results);
+    return { movies, totalPages: data.total_pages };
+  } catch (error) {
+    console.error('Error fetching popular movies:', error);
+    return { movies: [], totalPages: 1 };
   }
-}
+};
 
-// Trending Movies Day
-export const getTrendingMoviesDay = async () => {
-  try{
-    const response = await fetch(`${BASE_URL}/trending/movie/day?api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
-      throw new Error('Error al obtener las películas: ');
+// Películas de Tendencia de la Semana
+export const getTrendingMoviesWeek = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
+      throw new Error('Error al obtener las películas de tendencia');
     }
     const data = await response.json();
-    return data.results;
-  } catch (error){
+    const movies = await associateGenresToMovies(data.results);
+    return { movies, totalPages: data.total_pages };
+  } catch (error) {
     console.error('Error fetching trending movies:', error);
-    return [];
+    return { movies: [], totalPages: 1 };
   }
-}
+};
 
-// Now Playing Movies
-export const getNowPlayingMovies = async () => {
-  try{
-    const response = await fetch(`${BASE_URL}/discover/movie?include_video=true&api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
-      throw new Error('Error al obtener las películas: ');
+// Películas de Tendencia del Día
+export const getTrendingMoviesDay = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/trending/movie/day?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
+      throw new Error('Error al obtener las películas de tendencia del día');
     }
     const data = await response.json();
-    return data.results;
-  } catch (error){
+    const movies = await associateGenresToMovies(data.results);
+    return { movies, totalPages: data.total_pages };
+  } catch (error) {
     console.error('Error fetching trending movies:', error);
-    return [];
+    return { movies: [], totalPages: 1 };
   }
-}
+};
 
+// Películas en los Cines
+export const getNowPlayingMovies = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
+      throw new Error('Error al obtener las películas en los cines');
+    }
+    const data = await response.json();
+    const movies = await associateGenresToMovies(data.results);
+    return { movies, totalPages: data.total_pages };
+  } catch (error) {
+    console.error('Error fetching now playing movies:', error);
+    return { movies: [], totalPages: 1 };
+  }
+};
+
+// Películas con Videos
 export const getMoviesWithVideos = async () => {
   try {
-    // Paso 1: Obtener películas en los cines
-    const nowPlayingMovies = await getUpcomingMovies();
-
-    // Paso 2: Filtrar películas con videos
-    const moviesWithVideosPromises = nowPlayingMovies.map(async (movie) => {
+    const nowPlayingMovies = await getNowPlayingMovies(1);
+    const moviesWithVideosPromises = nowPlayingMovies.movies.map(async (movie) => {
       try {
         const videoResponse = await fetch(`${BASE_URL}/movie/${movie.id}/videos?api_key=${API_KEY}&language=es-ES`);
         if (!videoResponse.ok) {
@@ -85,11 +114,7 @@ export const getMoviesWithVideos = async () => {
         return null;
       }
     });
-
-    // Esperar a que todas las promesas se resuelvan
     const moviesWithVideos = await Promise.all(moviesWithVideosPromises);
-
-    // Filtrar películas que no tienen videos
     return moviesWithVideos.filter(movie => movie !== null);
   } catch (error) {
     console.error('Error fetching movies with videos:', error);
@@ -97,37 +122,44 @@ export const getMoviesWithVideos = async () => {
   }
 };
 
-// Top Rated Movies
-export const getTopRatedMovies = async () => {
-  try{
-    const response = await fetch(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
-      throw new Error('Error al obtener las películas: ');
+// Películas Mejor Valoradas
+export const getTopRatedMovies = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
+      throw new Error('Error al obtener las películas mejor valoradas');
     }
     const data = await response.json();
-    return data.results;
-  } catch (error){
-    console.error('Error fetching trending movies:', error);
-    return [];
+    const movies = await associateGenresToMovies(data.results);
+    return { movies, totalPages: data.total_pages };
+  } catch (error) {
+    console.error('Error fetching top rated movies:', error);
+    return { movies: [], totalPages: 1 };
   }
 };
 
-// Upcoming Movies
-export const getUpcomingMovies = async () => {
-  try{
-    const response = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
-      throw new Error('Error al obtener las películas: ');
+// Películas Próximamente
+export const getUpcomingMovies = async (page) => {
+  try {
+    const response = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&language=es-ES&page=${page}`);
+    if (!response.ok) {
+      throw new Error('Error al obtener las películas próximas');
     }
     const data = await response.json();
-    return data.results;
-  } catch (error){
-    console.error('Error fetching trending movies:', error);
-    return [];
+    const currentDate = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+    const futureMovies = data.results.filter(movie => movie.release_date > currentDate); // Filtra películas futuras
+    const totalPages = data.total_pages;
+    return {
+      movies: await associateGenresToMovies(futureMovies),
+      totalPages
+    };
+  } catch (error) {
+    console.error('Error fetching upcoming movies:', error);
+    return { movies: [], totalPages: 0 };
   }
 };
 
-// Movie Details
+// Detalles de Película
 export const getMovieDetails = async (movieId) => {
   try {
     const response = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=es-ES`);
@@ -135,18 +167,22 @@ export const getMovieDetails = async (movieId) => {
       throw new Error(`Error al obtener detalles de la película con ID ${movieId}`);
     }
     const data = await response.json();
-    return data;
+    const genres = await getGenres();
+    return {
+      ...data,
+      genres: data.genres.map(id => genres.find(genre => genre.id === id)).filter(genre => genre !== undefined)
+    };
   } catch (error) {
     console.error(`Error fetching movie details for ${movieId}:`, error);
     return null;
   }
 };
 
-// TV series
+// Series Populares
 export const getPopularSeries = async () => {
   try {
     const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}&language=es-ES`);
-    if (!response.ok){
+    if (!response.ok) {
       throw new Error('Error al obtener las series populares');
     }
     const data = await response.json();
@@ -155,4 +191,4 @@ export const getPopularSeries = async () => {
     console.error('Error fetching popular series', error);
     return [];
   }
-}
+};
