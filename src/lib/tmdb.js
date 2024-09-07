@@ -38,7 +38,7 @@ const getCredits = async (movieId) => {
       throw new Error('Error al obtener los créditos de la película');
     }
     const data = await response.json();
-    return data.cast;
+    return data;
   } catch (error) {
     console.error('Error fetching credits:', error);
     return [];

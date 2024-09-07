@@ -1,6 +1,7 @@
 ---
-const { genre } = Astro.props;
+const { genre, className } = Astro.props;
 
+// Function to get the class for the genre pill based on the genre no repeat colors
 function getGenreClass(genre: string){
   switch (genre){
     case "Acción":
@@ -47,4 +48,4 @@ function getGenreClass(genre: string){
 }
 ---
 
-<span class={`text-xs font-medium me-2 px-2.5 py-0.5 rounded-full ${getGenreClass(genre)}`}>{genre}</span>
+<span class={`${className} font-medium me-2 px-2.5 py-0.5 rounded-full ${getGenreClass(genre)}`}>{genre}</span>

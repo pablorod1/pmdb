@@ -63,16 +63,6 @@ const {title} = Astro.props;
 				(teasersContainer as HTMLDivElement).style.backgroundImage = `url(https://image.tmdb.org/t/p/original${nowPlayingMovies[movieIndex].backdrop_path})`;
 			}
 		});
-		const playIcon = teaser.querySelector('.play-icon');
-		playIcon?.addEventListener('click', () => {
-			let teaserId = teaser.getAttribute('data-id');
-			if (teaserId){
-				let movieIndex = parseInt(teaserId);
-				teaserPlayerDialog?.querySelector('iframe')?.setAttribute('src', `https://www.youtube.com/embed/${nowPlayingMovies[movieIndex].videos[0].key}`);
-				teaserPlayerDialog?.classList.remove('hidden');
-				teaserPlayerDialog?.classList.add('flex', 'justify-center', 'items-center');
-			}
-		});
 	});
 
 	playIcons?.forEach((playIcon) => {

@@ -25,7 +25,7 @@ const { title, items, btnContainer, typeSlider } = Astro.props;
     ) : typeSlider === 'video' ? (
       <VideoSlider title={title} />
     ) : typeSlider === 'cast' ? (
-      <MultipleGlide title={title} btnContainer={btnContainer}>
+      <MultipleGlide title={title} >
         <ul slot="glide-slides" class="glide__slides">
           {
             items.map((item: any) => (

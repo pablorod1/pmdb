@@ -5,7 +5,9 @@ import { getMovieDetails } from "@lib/tmdb";
 import { formatDate, formatVoteAverage } from "@components/MovieCard.astro";
 import { formatVotes } from "@components/MovieList";
 import ProgressSpinner2 from "@components/UI/ProgressSpinner2.astro";
-import GlideSlider from "@components/Sliders/GlideSlider.astro";
+import VideoModal from "@components/UI/VideoModal.astro";
+import PlayIcon from "@icons/PlayIcon.astro";
+import AnimatedButton from "@components/UI/AnimatedButton.astro";
 
 
 const id = Astro.url.href.split('/').pop();
@@ -23,48 +25,112 @@ const {
   poster_path, 
   vote_count ,
   runtime,
-  credits
+  credits,
+  tagline,
+  videos
 } = movie;
 
 const year = new Date(release_date).getFullYear();
 
+const crew = credits.crew;
+const cast = credits.cast;
+const trailerKey = videos[0].key;
+
+
+const popularCredits = cast.sort((a: any, b: any) => b.popularity - a.popularity).slice(0, 10);
+// order by popularity slice 10 and dont repeat id
+const popularCrew = crew.filter((crew: any, index: number, self: any) => 
+  index === self.findIndex((t: any) => (
+    t.id === crew.id
+  ))
+).sort((a: any, b: any) => b.popularity - a.popularity).slice(0, 5);
+
+function formatRuntime(runtime: number) {
+  const hours = Math.floor(runtime / 60);
+  const minutes = runtime % 60;
+  return `${hours}h ${minutes}min`;
+}
+
 ---
+
+<script>
+  import "@lib/carousel.js";
+</script>
 
 <Layout title={title}>
   <main>
     <div class="container-fluid py-20 flex justify-center items-center bg-cover bg-no-repeat" style={`background-image: url(https://image.tmdb.org/t/p/original${backdrop_path})`}>
       <div class="movie-info flex items-start gap-12 xl:max-w-[1200px] overflow-hidden">
         <img class="w-2/6 rounded-xl" src={`https://image.tmdb.org/t/p/original${poster_path}`} alt={title} />
-        <div class="flex flex-col justify-start items-start gap-10 mt-4">
+        <div class="flex flex-col justify-start items-start gap-6 ">
           <div class="flex flex-col items-start">
-            <h1 class="flex items-center gap-2 text-4xl font-bold text-white">
-              {title} <p class="pt-1 font-medium text-gray-400">({year})</p>
+            <h1 id="movie-title" class="flex items-center gap-2 text-5xl font-bold text-white">
+              {title} <p class="pt-1 font-medium text-gray-400 text-4xl">({year})</p>
             </h1>
-            <div class="flex items-center gap-2">
-              <span class="text-gray-400">{runtime} min</span>
-              <span class="text-gray-400"> | </span>
-              <span class="text-gray-400">{formatDate(release_date)}</span>
+            <div class="flex items-center gap-2 text-lg mt-4">
+              <span class="text-gray-300">{formatRuntime(runtime)}</span>
+              <span class="text-gray-300"> | </span>
+              <span class="text-gray-300">{formatDate(release_date)}</span>
             </div>
             <div class="flex items-center gap-1 mt-4">
               {
                 genres.map((genre: any) => (
-                  <GenrePill genre={genre.name}/>
+                  <GenrePill className="text-sm px-4" genre={genre.name}/>
                 ))
               }
             </div>
-            <p class="text-gray-200 mt-6 text-pretty">{overview}</>
+            <p class="text-gray-400 mt-4 text-pretty italic">{tagline}</>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4 w-full">
             <ProgressSpinner2  percentage={formatVoteAverage(vote_average)} size={80}/>
             <div class="flex flex-col items-start">
               <span class="text-white text-xl font-bold">Puntuación de los usuarios</span>
               <span class="text-gray-400">Votos totales: {formatVotes(vote_count)}</span>
             </div>
           </div>
+          <AnimatedButton id={trailerKey} className="play-icon group animated-button flex items-center gap-2">
+            Reproducir tráiler
+            <PlayIcon id="play-icon" class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out" />
+          </AnimatedButton>
+          <div>
+            <h2 class="text-white font-semibold text-2xl">Vista General</h2>
+            <p class="text-gray-300 mt-4">{overview}</p>
+          </div>
           <!-- <GlideSlider title="Reparto" items={credits} typeSlider="cast" /> -->
+          <div class="grid grid-cols-3 gap-12">
+            {
+              popularCrew.map((item: any) => (
+                <div class="flex flex-col justify-start items-start">
+                  <h3 class="text-white font-semibold">{item.name}</h3>
+                  <p class="text-gray-200 font-thin">{item.job}</p>
+                </div>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
+    <div class="py-20 flex justify-center items-center w-full">
+      <div class="flex flex-col gap-y-4 ">
+        <h1 class="flex text-white font-bold text-3xl">Reparto</h1>
+        <div class="grid grid-cols-5 gap-12 w-full">
+          {
+            popularCredits.map((credit: any) => (
+              <div class="flex flex-col items-center gap-2">
+                <div class="max-w-20 w-full rounded-xl overflow-hidden">
+                  <img class="w-full object-cover" src={`https://image.tmdb.org/t/p/original${credit.profile_path}`} alt={credit.name} />
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                  <span class="text-white text-sm text-center">{credit.name}</span>
+                  <span class="text-gray-300 text-sm text-center">{credit.character.split('/', [1])}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <VideoModal className="-top-[460px]"/>
   </main>
 </Layout>
 
@@ -89,5 +155,27 @@ const year = new Date(release_date).getFullYear();
 </style>
 
 <script>
-  import "@lib/carousel.js";
+  const playIcon = document.querySelector('.play-icon');
+  const videoModal = document.getElementById('video-modal');
+  const closeVideoModal = document.getElementById('close-modal');
+  const animatedButton = document.querySelector('.animated-button');
+  const trailerKey = animatedButton?.getAttribute('id');
+  const movieTitle = document.getElementById('movie-title');
+  const modalTitle = document.querySelector('.movie-trailer');
+
+  playIcon?.addEventListener('click', () => {
+    if (modalTitle && movieTitle) {
+      modalTitle.textContent = movieTitle.textContent;
+    }
+    videoModal?.querySelector('iframe')?.setAttribute('src', `https://www.youtube.com/embed/${trailerKey}`);
+    videoModal?.classList.remove('hidden');
+    videoModal?.classList.add('flex', 'justify-center', 'items-center', 'flex-col');
+			
+  });
+
+  closeVideoModal?.addEventListener('click', () => {
+    videoModal?.classList.add('hidden');
+		videoModal?.classList.remove('flex', 'justify-start', 'items-start', 'flex-col');
+		videoModal?.querySelector('iframe')?.setAttribute('src', '');
+  });
 </script>

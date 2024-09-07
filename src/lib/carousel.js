@@ -50,7 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const castsGlide = new Glide(".casts-glide", {
+    type: "carousel",
+    perView: 3,
+    gap: 20,
+  });
+
 
   singleGlide.mount();
   teasersGlide.mount();
+  castsGlide.mount();
 });
