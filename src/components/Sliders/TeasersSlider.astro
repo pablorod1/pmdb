@@ -9,7 +9,7 @@ nowPlayingMovies.sort((a: any, b: any) => b.popularity - a.popularity);
 const {title} = Astro.props;
 ---
 
-<div id="teasers-container" class="flex flex-col lg:px-24 w-full py-12 h-full bg-no-repeat bg-cover bg-center">
+<div id="teasers-container" class="flex flex-col px-4 lg:px-24 w-full py-12 h-full bg-no-repeat bg-cover bg-center">
   <h1 class="text-white font-bold text-3xl">{title}</h1>
   <div class="teasers-glide relative py-12">
     <div class="glide__track mx-12 !overflow-visible" data-glide-el="track">

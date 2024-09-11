@@ -3,9 +3,9 @@ import MultipleGlide from './MultipleGlide.astro';
 import SectionContainer from '../SectionContainer.astro';
 import MovieCard from '../MovieCard.astro';
 import SingleGlide from './SingleGlide.astro';
-import VideoSlider from './VideoSlider.astro';
+import TeasersSlider from './TeasersSlider.astro';
 
-const { title, items, btnContainer, typeSlider } = Astro.props;
+const { title, items, btnContainer, typeSlider, type } = Astro.props;
 ---
 
 <SectionContainer id={title.toLowerCase().replace(/\s+/g, '-')}>
@@ -15,15 +15,15 @@ const { title, items, btnContainer, typeSlider } = Astro.props;
     ) : typeSlider === 'multiple' ? (
       <MultipleGlide title={title} btnContainer={btnContainer} className="ps-4 lg:px-24">
         <ul slot="glide-slides" class="glide__slides">
-          {items.map((item: any) => (
+          {Array.isArray(items) ? items.map((item: any) => (
             <li slot="slides" class="glide__slide h-full">
-              <MovieCard {...item} id={item.id} />
+              <MovieCard {...item} id={item.id} type={type} />
             </li>
-          ))}
+          )) : null}
         </ul>
       </MultipleGlide>
-    ) : typeSlider === 'video' ? (
-      <VideoSlider title={title} />
+    ) : typeSlider === 'teaser' ? (
+      <TeasersSlider title={title} />
     ) : typeSlider === 'cast' ? (
       <MultipleGlide title={title} >
         <ul slot="glide-slides" class="glide__slides">

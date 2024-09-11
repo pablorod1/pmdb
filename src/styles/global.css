@@ -65,16 +65,7 @@
   position: absolute;
   box-shadow: none;
 }
-.multiple-glide .glide__slide--active:hover .progress-spinner-container{
-  opacity: 1;
-}
-.multiple-glide .glide__slide--active:hover img{
-  filter: brightness(0.8) blur(1px);
-}
-.multiple-glide .glide__slide:not(.glide__slide--active) .progress-spinner-container{
-  opacity: 1;
-  transform: scale(0.6) translate(-60%, 120%);
-}
+
 
 /* Teasers Glide */
 /* .teasers-glide .glide__track,
@@ -88,7 +79,7 @@
   transition: transform 0.3s ease;
 }
 .teaser-container:hover{
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 .teaser-container:hover .play-icon{
   transform: scale(1.2);
@@ -112,6 +103,17 @@ transition: opacity 0.5s ease-in-out;
 #teasers-container h1{
   z-index: 1;
 }	
+
+.description{
+  display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 4em;
+    margin-bottom: 2.5rem;
+}
 
 .btn.selected{
   background-color: var(--primary-color);

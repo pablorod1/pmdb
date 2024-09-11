@@ -1,42 +1,40 @@
 ---
 import GenrePill from "@components/UI/GenrePill.astro";
 import Layout from "@layouts/Layout.astro";
-import { getMovieDetails } from "@lib/tmdb";
+import { getSerieDetails } from "@lib/tmdb";
 import { formatDate, formatVoteAverage } from "@components/MovieCard.astro";
 import { formatVotes } from "@components/MovieList";
 import ProgressSpinner2 from "@components/UI/ProgressSpinner2.astro";
 import VideoModal from "@components/UI/VideoModal.astro";
 import PlayIcon from "@icons/PlayIcon.astro";
 import AnimatedButton from "@components/UI/AnimatedButton.astro";
-import GlideSlider from "@components/Sliders/GlideSlider.astro";
 
 
 const id = Astro.url.href.split('/').pop();
 
-const movie = await getMovieDetails(id);
-console.log(movie);
+const serie = await getSerieDetails(id);
+console.log(serie);
+
 const { 
-  title, 
-  release_date,
+  name, 
+  seasons,
   backdrop_path,
   vote_average, 
   genres, 
   overview, 
   poster_path, 
   vote_count ,
-  runtime,
   credits,
   tagline,
   videos,
   providers
-} = movie;
+} = serie;
 
-const year = new Date(release_date).getFullYear();
+const year = seasons[0].air_date.split('-')[0];
 
 const crew = credits.crew;
 const cast = credits.cast;
-let trailerKey: string = '';
-if (videos && videos.length > 0) trailerKey = videos[0].key;
+// const trailerKey = videos[0].key;
 
 
 const popularCredits = cast.sort((a: any, b: any) => b.popularity - a.popularity).slice(0, 10);
@@ -59,20 +57,20 @@ function formatRuntime(runtime: number) {
   import "@lib/carousel.js";
 </script>
 
-<Layout title={title}>
+<Layout title={name}>
   <main>
     <div class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat xl:px-0 md:px-10" style={`background-image: url(https://image.tmdb.org/t/p/original${backdrop_path})`}>
       <div class="movie-info flex flex-col items-center gap-12 md:flex-row md:items-start xl:max-w-[1200px] overflow-hidden">
-        <img class="w-full md:w-2/6 rounded-xl" src={`https://image.tmdb.org/t/p/original${poster_path}`} alt={title} />
+        <img class="w-full md:w-2/6 rounded-xl" src={`https://image.tmdb.org/t/p/original${poster_path}`} alt={name} />
         <div class="flex flex-col justify-start items-start gap-6 ">
           <div class="flex flex-col items-start">
             <h1 id="movie-title" class="flex flex-col items-start gap-2 text-5xl font-bold text-white leading-tight lg:flex-row lg:items-center">
-              {title} <p class="pt-1 font-medium text-gray-400 text-4xl">({year})</p>
+              {name} <p class="pt-1 font-medium text-gray-400 text-4xl">({year})</p>
             </h1>
             <div class="flex items-center gap-2 text-lg mt-4">
-              <span class="text-gray-300">{formatRuntime(runtime)}</span>
+              <span class="text-gray-300">{seasons.length} Temporadas</span>
               <span class="text-gray-300"> | </span>
-              <span class="text-gray-300">{formatDate(release_date)}</span>
+              <span class="text-gray-300">{formatDate(seasons[0].air_date)}</span>
             </div>
             <div class="flex items-center gap-1 mt-4">
               {
@@ -90,8 +88,12 @@ function formatRuntime(runtime: number) {
               <span class="text-gray-400">Votos totales: {formatVotes(vote_count)}</span>
             </div>
           </div>
-          <div class="flex items-end gap-8 ">
-            { providers && providers.length > 0 &&
+          <div class="flex items-center gap-8 ">
+            <!-- <AnimatedButton id={trailerKey} className="play-icon group animated-button flex items-center gap-2 text-nowrap">
+              Reproducir tráiler
+              <PlayIcon id="play-icon" class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out" />
+            </AnimatedButton> -->
+            { providers.length > 0 &&
               <div class="flex flex-col gap-y-2">
                 <h2 class="text-white font-semibold text-lg">Disponible en</h2>
                 <div class="flex items-center gap-6">
@@ -102,12 +104,6 @@ function formatRuntime(runtime: number) {
                   }
                 </div>
               </div>
-            }
-            {videos.length > 0 && videos &&
-              <AnimatedButton id={trailerKey} className="play-icon group animated-button flex items-center gap-2 text-nowrap">
-                Reproducir tráiler
-                <PlayIcon id="play-icon" class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out" />
-              </AnimatedButton>
             }
           </div>
           <div>
@@ -148,24 +144,22 @@ function formatRuntime(runtime: number) {
         </div>
       </div>
     </div>
-    {videos && videos.length > 0 && 
-      <div class="mx-10 py-10 flex justify-center items-start w-full ">
-        <div class="flex flex-col gap-y-4 w-full">
-          <h2 class="text-white font-bold text-3xl">Videos</h2>
-          <div class="flex items-center gap-4 overflow-scroll w-[96dvw]">
-            {
-              videos.map((video: any) => (
-                <div class="flex flex-col items-center gap-4">
-                  <iframe class="" src={`https://www.youtube.com/embed/${video.key}?enablejsapi=1`}  allowfullscreen></iframe>
-                  <h3 class="text-white font-semibold">{video.name}</h3>
-                </div>
-              ))
-            }
-          </div>
+    <!-- <div class="px-10 py-10 flex justify-center items-start w-full lg:px-0">
+      <div class="flex flex-col gap-y-4 w-full">
+        <h2 class="text-white font-bold text-3xl">Videos</h2>
+        <div class="flex items-center gap-4 overflow-scroll w-full max-w-screen-lg">
+          {
+            videos.map((video: any) => (
+              <div class="flex flex-col items-center gap-4">
+                <iframe class="" src={`https://www.youtube.com/embed/${video.key}`}  allowfullscreen></iframe>
+                <h3 class="text-white font-semibold">{video.name}</h3>
+              </div>
+            ))
+          }
         </div>
       </div>
-    }
-    <VideoModal className="-top-[460px]"/>
+    </div>
+    <VideoModal className="-top-[460px]"/> -->
   </main>
 </Layout>
 
