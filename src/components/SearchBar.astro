@@ -1,7 +1,7 @@
 ---
 import SearchIcon from "@icons/SearchIcon.astro";
 import { getTrendingMoviesWeek, getAllMoviesAndSeries } from "@lib/tmdb";
-import { formatDate } from "./MovieCard.astro";
+import { formatDate } from "@components/MovieCard.astro";
 import TrendingIcon from "@icons/TrendingIcon.astro";
 
 const { movies } = await getTrendingMoviesWeek(1);
