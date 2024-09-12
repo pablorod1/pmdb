@@ -13,7 +13,6 @@ import AnimatedButton from "@components/UI/AnimatedButton.astro";
 const id = Astro.url.href.split('/').pop();
 
 const serie = await getSerieDetails(id);
-console.log(serie);
 
 const { 
   name, 

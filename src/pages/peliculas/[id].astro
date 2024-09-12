@@ -14,7 +14,6 @@ import GlideSlider from "@components/Sliders/GlideSlider.astro";
 const id = Astro.url.href.split('/').pop();
 
 const movie = await getMovieDetails(id);
-console.log(movie);
 const { 
   title, 
   release_date,
