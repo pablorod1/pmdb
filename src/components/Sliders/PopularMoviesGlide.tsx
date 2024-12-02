@@ -2,9 +2,8 @@ import React from "react";
 import * as Glide from "@glidejs/glide";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import "@glidejs/glide/dist/css/glide.theme.min.css";
-import type { Movie } from "@lib/api/movies";
+import { getMoviesByType, type Movie } from "@lib/api/movies";
 import { formatDate, formatVoteAverage } from "src/common";
-import { getPopularMovies } from "@lib/tmdb";
 import { ProgressSpinner } from "@components/UI/ProgressSpinner";
 import Loader from "@components/UI/Loader";
 
@@ -17,7 +16,7 @@ const PopularMoviesGlide: React.FC = () => {
   React.useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const movies = await getPopularMovies(1);
+        const movies = await getMoviesByType("popular", 1);
         setMovies(movies.movies);
         setLoading(false);
       } catch (error) {

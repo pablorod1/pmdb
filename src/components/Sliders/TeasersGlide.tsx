@@ -2,11 +2,11 @@ import React from "react";
 import * as Glide from "@glidejs/glide";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import "@glidejs/glide/dist/css/glide.theme.min.css";
-import { getMoviesWithVideos } from "@lib/tmdb";
 import Loader from "@components/UI/Loader";
+import { getMoviesVideos, type Movie } from "@lib/api/movies";
 
 const TeasersGlide: React.FC = () => {
-  const [nowPlayingMovies, setNowPlayingMovies] = React.useState<any[]>([]);
+  const [movies, setMovies] = React.useState<Movie[]>([]);
   const [title, setTitle] = React.useState("Películas en Cartelera");
   const [loading, setLoading] = React.useState(true);
   const glideRef = React.useRef<Glide | null>(null);
@@ -14,8 +14,9 @@ const TeasersGlide: React.FC = () => {
   React.useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const movies = await getMoviesWithVideos();
-        setNowPlayingMovies(movies);
+        const movies = await getMoviesVideos();
+        console.log("movies", movies);
+        setMovies(movies);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching movies:", error);
@@ -28,7 +29,7 @@ const TeasersGlide: React.FC = () => {
 
   React.useEffect(() => {
     const initializeGlide = () => {
-      if (!loading && nowPlayingMovies.length > 0) {
+      if (!loading && movies.length > 0) {
         if (glideRef.current) {
           glideRef.current.destroy();
         }
@@ -60,7 +61,7 @@ const TeasersGlide: React.FC = () => {
     const closeTeaserPlayerDialog = document.getElementById("close-modal");
 
     if (teasersContainer && teasersContainer instanceof HTMLDivElement) {
-      teasersContainer.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${nowPlayingMovies[0].backdrop_path})`;
+      teasersContainer.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movies[0].backdrop_path})`;
 
       const teaserItems = teasersContainer.querySelectorAll('[id^="movie-"]');
       teaserItems.forEach((teaser) => {
@@ -69,7 +70,7 @@ const TeasersGlide: React.FC = () => {
           // Check if teaserId === nowPlayingMovies[teaserId]
           if (teaserId) {
             let movieIndex = parseInt(teaserId);
-            teasersContainer.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${nowPlayingMovies[movieIndex].backdrop_path})`;
+            teasersContainer.style.backgroundImage = `url(https://image.tmdb.org/t/p/original${movies[movieIndex].backdrop_path})`;
           }
         });
       });
@@ -84,7 +85,7 @@ const TeasersGlide: React.FC = () => {
               let movieTrailer =
                 teaserPlayerDialog?.querySelector(".movie-trailer");
               if (movieTrailer) {
-                movieTrailer.textContent = nowPlayingMovies[movieIndex].title;
+                movieTrailer.textContent = movies[movieIndex].title;
               }
               if (
                 teaserPlayerDialog &&
@@ -94,7 +95,7 @@ const TeasersGlide: React.FC = () => {
                 if (iframe) {
                   iframe.setAttribute(
                     "src",
-                    `https://www.youtube.com/embed/${nowPlayingMovies[movieIndex].videos[0].key}`
+                    `https://www.youtube.com/embed/${movies[movieIndex].videos[0].key}`
                   );
                 }
                 const html = document.querySelector("html");
@@ -138,7 +139,7 @@ const TeasersGlide: React.FC = () => {
         glideRef.current = null;
       }
     };
-  }, [loading, nowPlayingMovies]);
+  }, [loading, movies]);
 
   if (loading)
     return (
@@ -146,7 +147,7 @@ const TeasersGlide: React.FC = () => {
         <Loader />
       </div>
     );
-  if (nowPlayingMovies.length === 0) {
+  if (movies.length === 0) {
     return (
       <div className="bg-gray-200 mb-8 py-2 px-4 w-full">
         <p>No items found.</p>
@@ -166,7 +167,7 @@ const TeasersGlide: React.FC = () => {
           data-glide-el="track"
         >
           <ul className="glide__slides !overflow-visible">
-            {nowPlayingMovies.map((movie: any, index: number) => (
+            {movies.map((movie: Movie, index: number) => (
               <li
                 key={index}
                 id={`movie-${index}`}
@@ -175,13 +176,13 @@ const TeasersGlide: React.FC = () => {
                 className="glide__slide overflow-visible"
               >
                 <div className="flex flex-col justify-center items-center gap-y-4">
-                  <div className="teaser-container relative flex justify-center items-center rounded-xl ">
+                  <div className="teaser-container group relative flex justify-center items-center rounded-xl ">
                     <img
-                      className="w-full brightness-75 rounded-xl"
+                      className="w-full brightness-90 rounded-xl group-hover:scale-[1.01] transition-transform duration-200 ease-in-out"
                       src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
                       loading="lazy"
                     />
-                    <span className="play-icon size-14 absolute cursor-pointer transition-transform duration-200 ease-in-out">
+                    <span className="play-icon group-hover:scale-110 size-14 absolute cursor-pointer transition-transform duration-200 ease-in-out">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -194,10 +195,12 @@ const TeasersGlide: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex flex-col justify-center items-center">
-                    <h2 className="text-white text-sm">{movie.title}</h2>
-                    <p className="text-gray-300 text-sm text-center">
+                    <h2 className="text-white text-xl font-medium">
+                      {movie.title}
+                    </h2>
+                    {/* <p className="text-gray-300 text-sm text-center">
                       {movie.videos[0].name}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </li>

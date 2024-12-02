@@ -2,8 +2,8 @@ import React from "react";
 import * as Glide from "@glidejs/glide";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import "@glidejs/glide/dist/css/glide.theme.min.css";
-import { getNowPlayingMovies } from "@lib/tmdb";
 import Loader from "@components/UI/Loader";
+import { getMoviesByType } from "@lib/api/movies";
 
 const HeaderGlide: React.FC = () => {
   const [movies, setMovies] = React.useState<any[]>([]);
@@ -13,7 +13,7 @@ const HeaderGlide: React.FC = () => {
   React.useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const movies = await getNowPlayingMovies(1);
+        const movies = await getMoviesByType("now_playing", 1);
         setMovies(movies.movies);
         setLoading(false);
       } catch (error) {

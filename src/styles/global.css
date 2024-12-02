@@ -110,23 +110,10 @@
   overflow: visible !important;
 }
 
-/* Teasers Glide */
-/* .teasers-glide .glide__track,
-.teasers-glide .glide__slides{
-  overflow: visible !important;
-} */
-.teaser-container {
-  transition: transform 0.3s ease;
-}
 .teaser-container svg {
   transition: transform 0.3s ease;
 }
-.teaser-container:hover {
-  transform: scale(1.05);
-}
-.teaser-container:hover .play-icon {
-  transform: scale(1.2);
-}
+
 #teasers-container {
   position: relative;
   overflow: hidden;

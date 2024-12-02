@@ -67,6 +67,34 @@ export const getMoviesByType = async (
   };
 };
 
+export const getMoviesVideos = async (): Promise<Movie[]> => {
+  try {
+    const response = await fetch(
+      `${MOVIE_URL}/now_playing?api_key=${API_KEY}&language=es-ES&page=1`
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    const movies = data.results;
+    for (let i = 0; i < movies.length; i++) {
+      const response = await fetch(
+        `${MOVIE_URL}/${movies[i].id}/videos?api_key=${API_KEY}&language=es-ES`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const dataVideos = await response.json();
+      movies[i].videos = dataVideos.results;
+    }
+    return movies;
+  } catch (error) {
+    console.error("Error fetching data", error);
+  }
+
+  return [];
+};
+
 export const getMovieByName = async (name: string) => {
   try {
     for (let i = 1; i <= 100; i++) {
