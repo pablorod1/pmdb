@@ -1,41 +1,36 @@
 ---
-import Layout from '@layouts/Layout.astro';
-
-import GlideSlider from '@components/Sliders/GlideSlider.astro';
-import VideoModal from '@components/UI/VideoModal.astro';
-
-import '@styles/global.css';
-
-import * as tmdb from '@lib/tmdb';
-
-const nowPlayingMovies = await tmdb.getNowPlayingMovies(1);
-const popularMovies = await tmdb.getPopularMovies(1);
-const trendingMoviesDay = await tmdb.getTrendingMoviesDay(1);
-const trendingMoviesWeek = await tmdb.getTrendingMoviesWeek(1);
-
-
-const popularSeries = await tmdb.getPopularSeries(1);
+import Layout from "@layouts/Layout.astro";
+import VideoModal from "@components/UI/VideoModal.astro";
+import HeaderGlide from "@components/Sliders/HeaderGlide";
+import TeasersGlide from "@components/Sliders/TeasersGlide";
+import ProviderMoviesGlide from "@components/Sliders/ProviderMoviesGlide";
+import PopularMoviesGlide from "@components/Sliders/PopularMoviesGlide";
+import ProviderSeriesGlide from "@components/Sliders/ProviderSeriesGlide";
+import SectionContainer from "@components/SectionContainer.astro";
 ---
 
 <Layout title="Inicio">
-	<main>
-		<GlideSlider title="Películas Populares" items={nowPlayingMovies.movies} typeSlider="single" />
+  <main class="relative">
+    <SectionContainer>
+      <HeaderGlide client:load />
+    </SectionContainer>
 
-		<GlideSlider title="Tendencias Esta Semana" items={trendingMoviesWeek.movies} typeSlider="multiple" type="movies"/>
+    <SectionContainer>
+      <ProviderMoviesGlide client:only="react" />
+    </SectionContainer>
 
-		<GlideSlider title="Películas en Cartelera" typeSlider="teaser"/>
+    <SectionContainer>
+      <ProviderSeriesGlide client:only="react" />
+    </SectionContainer>
 
-		<GlideSlider title="Películas Populares" items={popularMovies.movies} typeSlider="multiple" type="movies"/>
+    <SectionContainer>
+      <TeasersGlide client:load />
+    </SectionContainer>
 
-		<GlideSlider title="Series Populares" items={popularSeries.series} typeSlider="multiple" type="series"/>
+    <SectionContainer>
+      <PopularMoviesGlide client:load />
+    </SectionContainer>
 
-		<!-- Teaser Player Dialog -->
-		<VideoModal className="-top-4"/>
-	</main>
+    <VideoModal />
+  </main>
 </Layout>
-
-
-<script>
-  import "@lib/carousel.js";
-</script>
-

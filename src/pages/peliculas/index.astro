@@ -1,19 +1,26 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { getTopRatedMovies } from "@lib/tmdb";
-import  MovieList  from "@components/MovieList.jsx";
+import MovieList from "@components/MovieList";
+import {
+  allProviders,
+  discoverMoviesByProvider,
+  type MoviesResponse,
+} from "@lib/api/movies";
 
 // Obtén las primeras películas en el lado del servidor
-const initialMovies = await getTopRatedMovies(1);
-// Order by vote average
-initialMovies.movies.sort((a: any, b: any) => b.vote_average - a.vote_average);
+
+const initialMovies: MoviesResponse = await discoverMoviesByProvider(
+  1,
+  allProviders.map((provider) => provider.provider_id.toString()).join("|")
+);
 ---
 
 <Layout title="Películas">
-  <main>     
-      {/* Renderiza el componente de React */}
-      <MovieList initialMovies={initialMovies} initialType={'top-rated'} client:load />
+  <main>
+    <MovieList
+      initialMovies={initialMovies}
+      initialProvider={allProviders}
+      client:only="react"
+    />
   </main>
 </Layout>
-
-

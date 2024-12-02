@@ -1,169 +1,200 @@
 ---
 import GenrePill from "@components/UI/GenrePill.astro";
 import Layout from "@layouts/Layout.astro";
-import { getMovieDetails } from "@lib/tmdb";
-import { formatDate, formatVoteAverage } from "@components/MovieCard.astro";
-import { formatVotes } from "@components/MovieList";
-import ProgressSpinner2 from "@components/UI/ProgressSpinner2.astro";
+
 import VideoModal from "@components/UI/VideoModal.astro";
 import PlayIcon from "@icons/PlayIcon.astro";
 import AnimatedButton from "@components/UI/AnimatedButton.astro";
+import {
+  formatDate,
+  formatRuntime,
+  formatVoteAverage,
+  formatVotes,
+} from "src/common";
+import { ProgressSpinner } from "@components/UI/ProgressSpinner";
+import {
+  getMovieById,
+  type Video,
+  type MovieDetails,
+  type Crew,
+  type Cast,
+} from "@lib/api/movies";
 
-
-const id = Astro.url.href.split('/').pop();
-
-const movie = await getMovieDetails(id);
-const { 
-  title, 
-  release_date,
-  backdrop_path,
-  vote_average, 
-  genres, 
-  overview, 
-  poster_path, 
-  vote_count ,
-  runtime,
-  credits,
-  tagline,
-  videos,
-  providers
-} = movie;
-
-const year = new Date(release_date).getFullYear();
-
-const crew = credits.crew;
-const cast = credits.cast;
-let trailerKey: string = '';
-if (videos && videos.length > 0) trailerKey = videos[0].key;
-
-
-const popularCredits = cast.sort((a: any, b: any) => b.popularity - a.popularity).slice(0, 10);
-// order by popularity slice 10 and dont repeat id
-const popularCrew = crew.filter((crew: any, index: number, self: any) => 
-  index === self.findIndex((t: any) => (
-    t.id === crew.id
-  ))
-).sort((a: any, b: any) => b.popularity - a.popularity).slice(0, 5);
-
-function formatRuntime(runtime: number) {
-  const hours = Math.floor(runtime / 60);
-  const minutes = runtime % 60;
-  return `${hours}h ${minutes}min`;
-}
-
+const url = new URL(Astro.request.url);
+const id = Number(url.pathname.split("/")[2]);
+const movie: MovieDetails = await getMovieById(id);
 ---
 
-<script>
-  import "@lib/carousel.js";
-</script>
-
-<Layout title={title}>
+<Layout title={movie.title}>
   <main>
-    <div class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat xl:px-0 md:px-10" style={`background-image: url(https://image.tmdb.org/t/p/original${backdrop_path})`}>
-      <div class="movie-info flex flex-col items-center gap-12 md:flex-row md:items-start xl:max-w-[1200px] overflow-hidden">
-        <img class="w-full md:w-2/6 rounded-xl" src={`https://image.tmdb.org/t/p/original${poster_path}`} alt={title} />
-        <div class="flex flex-col justify-start items-start gap-6 ">
-          <div class="flex flex-col items-start">
-            <h1 id="movie-title" class="flex flex-col items-start gap-2 text-5xl font-bold text-white leading-tight lg:flex-row lg:items-center">
-              {title} <p class="pt-1 font-medium text-gray-400 text-4xl">({year})</p>
-            </h1>
-            <div class="flex items-center gap-2 text-lg mt-4">
-              <span class="text-gray-300">{formatRuntime(runtime)}</span>
-              <span class="text-gray-300"> | </span>
-              <span class="text-gray-300">{formatDate(release_date)}</span>
+    <div
+      class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat xl:px-0 md:px-10"
+      style={`background-image: url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`}
+    >
+      <div
+        class="movie-info flex flex-col gap-12 items-stretch xl:max-w-[1200px] overflow-hidden"
+      >
+        <div class="flex flex-col sm:flex-row items-start gap-12">
+          <img
+            class="aspect-auto w-2/6 h-auto rounded-xl object-cover"
+            src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+            alt={movie.title}
+          />
+          <div class="flex flex-col justify-start items-start gap-6">
+            <div class="flex flex-col items-start">
+              <h1
+                id="movie-title"
+                class="flex flex-col items-start gap-2 text-5xl font-bold text-white leading-tight lg:flex-row lg:items-center"
+              >
+                {movie.title}
+                <p class="pt-1 font-medium text-gray-400 text-4xl">
+                  ({new Date(movie.release_date).getFullYear()})
+                </p>
+              </h1>
+              <div class="flex items-center gap-2 text-lg mt-4">
+                <span class="text-gray-300">{formatRuntime(movie.runtime)}</span
+                >
+                <span class="text-gray-300"> | </span>
+                <span class="text-gray-300"
+                  >{formatDate(movie.release_date)}</span
+                >
+              </div>
+              <div class="flex flex-wrap items-center gap-1 gap-y-4 mt-4">
+                {
+                  movie.genres.map((genre: any) => (
+                    <GenrePill className="text-sm px-4" genre={genre.name} />
+                  ))
+                }
+              </div>
+              <p class="text-gray-400 mt-4 text-pretty italic">
+                {movie.tagline}
+              </p>
             </div>
-            <div class="flex items-center gap-1 mt-4">
+            <div class="flex items-center gap-4 w-full">
+              <ProgressSpinner
+                client:only="react"
+                percentage={formatVoteAverage(movie.vote_average)}
+                size={80}
+              />
+              <div class="flex flex-col items-start">
+                <span class="text-white text-xl font-bold"
+                  >Puntuación de los usuarios</span
+                >
+                <span class="text-gray-400"
+                  >Votos totales: {formatVotes(movie.vote_count)}</span
+                >
+              </div>
+            </div>
+            <div class="flex flex-col items-start gap-8">
               {
-                genres.map((genre: any) => (
-                  <GenrePill className="text-sm px-4" genre={genre.name}/>
-                ))
+                movie.providers && movie.providers.length > 0 && (
+                  <div class="flex flex-col gap-y-2">
+                    <h2 class="text-white font-semibold text-lg">
+                      Disponible en
+                    </h2>
+                    <div class="flex items-center gap-6">
+                      {movie.providers.map((item: any) => (
+                        <img
+                          class="w-14 rounded-xl"
+                          src={`https://image.tmdb.org/t/p/original${item.logo_path}`}
+                          alt={item.provider_name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+              {
+                movie.videos && movie.videos.length > 0 && (
+                  <AnimatedButton
+                    id={movie.videos[0].key}
+                    className="play-icon group animated-button flex items-center gap-2 text-nowrap"
+                  >
+                    Reproducir tráiler
+                    <PlayIcon
+                      id="play-icon"
+                      class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out"
+                    />
+                  </AnimatedButton>
+                )
               }
             </div>
-            <p class="text-gray-400 mt-4 text-pretty italic">{tagline}</>
           </div>
-          <div class="flex items-center gap-4 w-full">
-            <ProgressSpinner2  percentage={formatVoteAverage(vote_average)} size={80}/>
-            <div class="flex flex-col items-start">
-              <span class="text-white text-xl font-bold">Puntuación de los usuarios</span>
-              <span class="text-gray-400">Votos totales: {formatVotes(vote_count)}</span>
-            </div>
-          </div>
-          <div class="flex items-end gap-8 ">
-            { providers && providers.length > 0 &&
-              <div class="flex flex-col gap-y-2">
-                <h2 class="text-white font-semibold text-lg">Disponible en</h2>
-                <div class="flex items-center gap-6">
-                  {
-                    providers.map((item: any) => (
-                      <img class="w-14 rounded-xl" src={`https://image.tmdb.org/t/p/original${item.logo_path}`} alt={item.provider_name} />
-                    ))
-                  }
-                </div>
-              </div>
-            }
-            {videos.length > 0 && videos &&
-              <AnimatedButton id={trailerKey} className="play-icon group animated-button flex items-center gap-2 text-nowrap">
-                Reproducir tráiler
-                <PlayIcon id="play-icon" class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out" />
-              </AnimatedButton>
-            }
-          </div>
+        </div>
+        <div class="flex flex-col gap-12">
           <div>
             <h2 class="text-white font-semibold text-2xl">Vista General</h2>
-            <p class="text-gray-300 mt-4">{overview}</p>
+            <p class="text-gray-300 mt-4">{movie.overview}</p>
           </div>
-          <!-- <GlideSlider title="Reparto" items={credits} typeSlider="cast" /> -->
           <div class="grid grid-cols-3 gap-12">
             {
-              popularCrew.map((item: any) => (
-                <div class="flex flex-col justify-start items-start">
-                  <h3 class="text-white font-semibold">{item.name}</h3>
-                  <p class="text-gray-200 font-thin">{item.job}</p>
-                </div>
-              ))
+              movie.credits.crew
+                .sort((a: Crew, b: Crew) => b.popularity - a.popularity)
+                .slice(0, 5)
+                .map((item: any) => (
+                  <div class="flex flex-col justify-start items-start">
+                    <h3 class="text-white font-semibold">{item.name}</h3>
+                    <p class="text-gray-200 font-thin">{item.job}</p>
+                  </div>
+                ))
             }
           </div>
         </div>
       </div>
     </div>
-    <div class="px-10 py-20 flex justify-center items-center w-full lg:px-0">
-      <div class="flex flex-col gap-y-4 ">
+    <div class="px-10 py-20 flex justify-center items-center w-full">
+      <div class="flex flex-col w-full gap-y-4">
         <h2 class="text-white font-bold text-3xl">Reparto</h2>
         <div class="grid grid-cols-3 md:grid-cols-5 gap-12 w-full">
           {
-            popularCredits.map((credit: any) => (
-              <div class="flex flex-col items-center gap-2">
-                <div class="max-w-20 w-full rounded-xl overflow-hidden">
-                  <img class="w-full object-cover" src={`https://image.tmdb.org/t/p/original${credit.profile_path}`} alt={credit.name} />
+            movie.credits.cast
+              .sort((a: Cast, b: Cast) => b.popularity - a.popularity)
+              .slice(0, 10)
+              .map((credit: any) => (
+                <div class="flex flex-col items-center gap-2">
+                  <div class="max-w-20 w-full rounded-xl overflow-hidden">
+                    <img
+                      class="w-full object-cover"
+                      src={`https://image.tmdb.org/t/p/original${credit.profile_path}`}
+                      alt={credit.name}
+                    />
+                  </div>
+                  <div class="flex flex-col items-center justify-center">
+                    <span class="text-white text-sm text-center">
+                      {credit.name}
+                    </span>
+                    <span class="text-gray-300 text-sm text-center">
+                      {credit.character.split("/", [1])}
+                    </span>
+                  </div>
                 </div>
-                <div class="flex flex-col items-center justify-center">
-                  <span class="text-white text-sm text-center">{credit.name}</span>
-                  <span class="text-gray-300 text-sm text-center">{credit.character.split('/', [1])}</span>
-                </div>
-              </div>
-            ))
+              ))
           }
         </div>
       </div>
     </div>
-    {videos && videos.length > 0 && 
-      <div class="mx-10 py-10 flex justify-center items-start w-full ">
-        <div class="flex flex-col gap-y-4 w-full">
-          <h2 class="text-white font-bold text-3xl">Videos</h2>
-          <div class="flex items-center gap-4 overflow-scroll w-[96dvw]">
-            {
-              videos.map((video: any) => (
+    {
+      movie.videos && movie.videos.length > 0 && (
+        <div class="px-10 py-10 flex justify-center items-start w-full ">
+          <div class="flex flex-col gap-y-4 w-full">
+            <h2 class="text-white font-bold text-3xl">Videos</h2>
+            <div class="flex items-center gap-4 overflow-scroll w-[96dvw]">
+              {movie.videos.map((video: Video) => (
                 <div class="flex flex-col items-center gap-4">
-                  <iframe class="" src={`https://www.youtube.com/embed/${video.key}?enablejsapi=1`}  allowfullscreen></iframe>
+                  <iframe
+                    class=""
+                    src={`https://www.youtube.com/embed/${video.key}?enablejsapi=1`}
+                    allowfullscreen
+                  />
                   <h3 class="text-white font-semibold">{video.name}</h3>
                 </div>
-              ))
-            }
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )
     }
-    <VideoModal className="-top-[460px]"/>
+    <VideoModal className="-top-[460px]" />
   </main>
 </Layout>
 
@@ -173,13 +204,13 @@ function formatRuntime(runtime: number) {
   }
 
   .container-fluid::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, .9); /* Capa negra con opacidad */
+    background-color: rgba(0, 0, 0, 0.9); /* Capa negra con opacidad */
     z-index: 0;
   }
   .movie-info {
@@ -188,27 +219,38 @@ function formatRuntime(runtime: number) {
 </style>
 
 <script>
-  const playIcon = document.querySelector('.play-icon');
-  const videoModal = document.getElementById('video-modal');
-  const closeVideoModal = document.getElementById('close-modal');
-  const animatedButton = document.querySelector('.animated-button');
-  const trailerKey = animatedButton?.getAttribute('id');
-  const movieTitle = document.getElementById('movie-title');
-  const modalTitle = document.querySelector('.movie-trailer');
+  const playIcon = document.querySelector(".play-icon");
+  const videoModal = document.getElementById("video-modal");
+  const closeVideoModal = document.getElementById("close-modal");
+  const animatedButton = document.querySelector(".animated-button");
+  const trailerKey = animatedButton?.getAttribute("id");
+  const movieTitle = document.getElementById("movie-title");
+  const modalTitle = document.querySelector(".movie-trailer");
 
-  playIcon?.addEventListener('click', () => {
+  playIcon?.addEventListener("click", () => {
     if (modalTitle && movieTitle) {
       modalTitle.textContent = movieTitle.textContent;
     }
-    videoModal?.querySelector('iframe')?.setAttribute('src', `https://www.youtube.com/embed/${trailerKey}`);
-    videoModal?.classList.remove('hidden');
-    videoModal?.classList.add('flex', 'justify-center', 'items-center', 'flex-col');
-			
+    videoModal
+      ?.querySelector("iframe")
+      ?.setAttribute("src", `https://www.youtube.com/embed/${trailerKey}`);
+    videoModal?.classList.remove("hidden");
+    videoModal?.classList.add(
+      "flex",
+      "justify-center",
+      "items-center",
+      "flex-col"
+    );
   });
 
-  closeVideoModal?.addEventListener('click', () => {
-    videoModal?.classList.add('hidden');
-		videoModal?.classList.remove('flex', 'justify-start', 'items-start', 'flex-col');
-		videoModal?.querySelector('iframe')?.setAttribute('src', '');
+  closeVideoModal?.addEventListener("click", () => {
+    videoModal?.classList.add("hidden");
+    videoModal?.classList.remove(
+      "flex",
+      "justify-start",
+      "items-start",
+      "flex-col"
+    );
+    videoModal?.querySelector("iframe")?.setAttribute("src", "");
   });
 </script>
