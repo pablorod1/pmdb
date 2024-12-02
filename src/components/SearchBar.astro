@@ -1,34 +1,66 @@
 ---
 import SearchIcon from "@icons/SearchIcon.astro";
-import { getTrendingMoviesWeek, getAllMoviesAndSeries } from "@lib/tmdb";
-import { formatDate } from "@components/MovieCard.astro";
+import { getTrendingMoviesWeek } from "@lib/tmdb";
+import { formatDate } from "src/common";
 import TrendingIcon from "@icons/TrendingIcon.astro";
 
 const { movies } = await getTrendingMoviesWeek(1);
 const trendingMovies = movies;
-
 ---
 
-<button id="searchButton" type="button"><SearchIcon class="size-5"/></button>
+<button id="searchButton" type="button"><SearchIcon class="size-5" /></button>
 
-<div id="searchContainer" class="hidden w-screen h-screen bg-black bg-opacity-60  absolute top-0 left-0 justify-center items-start pt-40 z-30">
+<div
+  id="searchContainer"
+  class="hidden w-screen h-screen bg-black bg-opacity-60 absolute top-0 left-0 justify-center items-start pt-40 z-30"
+>
   <div>
-    <button id="closeSearchBar" type="button" class="absolute top-0 right-0 p-4" aria-label="Cerrar">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    <button
+      id="closeSearchBar"
+      type="button"
+      class="absolute top-0 right-0 p-4"
+      aria-label="Cerrar"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-6 h-6 text-white"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
   </div>
-  <div class="flex flex-col items-start max-w-[800px] w-full max-h-[500px] h-full">
-    <input type="text" id="searchInput" placeholder="Buscar..." class="absolute -top-16 max-w-[800px] w-full h-10 px-4 py-6 text-md text-white bg-[var(--background-color)] rounded-lg rounded-b-none focus:outline-none focus:shadow-none focus:ring-0 focus:border-0 transition-all duration-300 ease-in-out" />
-    <div class="bg-[var(--background-color)] rounded-lg rounded-t-none w-full h-full overflow-scroll">
+  <div
+    class="flex flex-col items-start max-w-[800px] w-full max-h-[500px] h-full"
+  >
+    <input
+      type="text"
+      id="searchInput"
+      placeholder="Buscar..."
+      class="absolute -top-16 max-w-[800px] w-full h-10 px-4 py-6 text-md text-white bg-[var(--background-color)] rounded-lg rounded-b-none focus:outline-none focus:shadow-none focus:ring-0 focus:border-0 transition-all duration-300 ease-in-out"
+    />
+    <div
+      class="bg-[var(--background-color)] rounded-lg rounded-t-none w-full h-full overflow-scroll"
+    >
       <ul id="trendingList" class="flex flex-col gap-4 p-4">
-        <h2 class="text-white font-semibold flex items-center gap-2"><TrendingIcon class="size-6"/>Tendencias</h2>
+        <h2 class="text-white font-semibold flex items-center gap-2">
+          <TrendingIcon class="size-6" />Tendencias
+        </h2>
         {
           trendingMovies.map((movie: any) => (
             <li>
               <a class="flex items-start gap-4" href={`/peliculas/${movie.id}`}>
-                <img class="w-20 h-20 object-cover rounded-lg" src={`https://image.tmdb.org/t/p/original${movie.poster_path}`} alt={movie.title} />
+                <img
+                  class="w-20 h-20 object-cover rounded-lg"
+                  src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
+                  alt={movie.title}
+                />
                 <div class="flex flex-col items-start">
                   <h3 class="text-white font-semibold">{movie.title}</h3>
                   <p class="text-gray-300">{formatDate(movie.release_date)}</p>
@@ -38,9 +70,7 @@ const trendingMovies = movies;
           ))
         }
       </ul>
-      <ul id="searchResultsList" class="hidden flex-col gap-4 p-4">
-        
-      </ul>
+      <ul id="searchResultsList" class="hidden flex-col gap-4 p-4"></ul>
     </div>
   </div>
 </div>
@@ -52,18 +82,18 @@ const trendingMovies = movies;
 </style>
 
 <script>
-  import { getAllMoviesAndSeries } from '@lib/tmdb';
-  import { formatDate } from './MovieCard.astro';
+  import { getAllMoviesAndSeries } from "@lib/tmdb";
+  import { formatDate } from "src/common";
 
-  document.addEventListener('DOMContentLoaded', async () => {
-    const searchButton = document.getElementById('searchButton');
-    const searchContainer = document.getElementById('searchContainer');
-    const searchInput = document.getElementById('searchInput');
-    const html = document.querySelector('html');
-    const closeSearchBar = document.getElementById('closeSearchBar');
+  document.addEventListener("DOMContentLoaded", async () => {
+    const searchButton = document.getElementById("searchButton");
+    const searchContainer = document.getElementById("searchContainer");
+    const searchInput = document.getElementById("searchInput");
+    const html = document.querySelector("html");
+    const closeSearchBar = document.getElementById("closeSearchBar");
 
-    const trendingList = document.getElementById('trendingList');
-    const searchResultsList = document.getElementById('searchResultsList');
+    const trendingList = document.getElementById("trendingList");
+    const searchResultsList = document.getElementById("searchResultsList");
 
     const allMoviesAndSeries: any = await getAllMoviesAndSeries();
 
@@ -71,67 +101,69 @@ const trendingMovies = movies;
 
     let isSearchOpen = false;
 
-    searchButton?.addEventListener('click', () => {
-      if (searchContainer){
-        searchContainer.classList.remove('hidden');
-        searchContainer.classList.add('flex');
+    searchButton?.addEventListener("click", () => {
+      if (searchContainer) {
+        searchContainer.classList.remove("hidden");
+        searchContainer.classList.add("flex");
 
-        if (html) html.classList.add('!overflow-hidden');
+        if (html) html.classList.add("!overflow-hidden");
 
-        if (searchInput){
+        if (searchInput) {
           // Translate Y 50%
           searchInput.focus();
-          searchInput.classList.add('translate-y-50');
+          searchInput.classList.add("translate-y-50");
         }
         isSearchOpen = true;
       }
     });
 
     // Close search container when esc pressed
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          searchContainer?.classList.remove('flex');
-          searchContainer?.classList.add('hidden');
-        }
-        if (html) html.classList.remove('!overflow-hidden');
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        searchContainer?.classList.remove("flex");
+        searchContainer?.classList.add("hidden");
+      }
+      if (html) html.classList.remove("!overflow-hidden");
     });
 
-    closeSearchBar?.addEventListener('click', () => {
-        searchContainer?.classList.remove('flex');
-        searchContainer?.classList.add('hidden');
-      if (html) html.classList.remove('!overflow-hidden');
-
+    closeSearchBar?.addEventListener("click", () => {
+      searchContainer?.classList.remove("flex");
+      searchContainer?.classList.add("hidden");
+      if (html) html.classList.remove("!overflow-hidden");
     });
 
-    searchInput?.addEventListener('keydown', (e) => {
-        if (e.target) {
-            const searchValue = (e.target as HTMLInputElement).value;
-            if (searchValue === '') {
-              trendingList?.classList.remove('hidden');
-              trendingList?.classList.add('flex');
-              searchResultsList?.classList.add('hidden');
-              searchResultsList?.classList.remove('flex');
-              return;
-            } else {
-              
-              trendingList?.classList.add('hidden');
-              trendingList?.classList.remove('flex');
-              searchResults = allMoviesAndSeries.filter((movie: any) => {
-                if (movie.title) {
-                  return movie.title.toLowerCase().includes(searchValue.toLowerCase());
-                } else if (movie.name) {
-                  return movie.name.toLowerCase().includes(searchValue.toLowerCase());
-                }
-              });
-              
-              if (searchResultsList){
-                searchResultsList.innerHTML = '';
-                searchResultsList.classList.remove('hidden');
-                searchResultsList.classList.add('flex');
-                searchResults.forEach((movie: any) => {
-                  const li = document.createElement('li');
-                  if (movie.title){
-                    li.innerHTML = `
+    searchInput?.addEventListener("keydown", (e) => {
+      if (e.target) {
+        const searchValue = (e.target as HTMLInputElement).value;
+        if (searchValue === "") {
+          trendingList?.classList.remove("hidden");
+          trendingList?.classList.add("flex");
+          searchResultsList?.classList.add("hidden");
+          searchResultsList?.classList.remove("flex");
+          return;
+        } else {
+          trendingList?.classList.add("hidden");
+          trendingList?.classList.remove("flex");
+          searchResults = allMoviesAndSeries.filter((movie: any) => {
+            if (movie.title) {
+              return movie.title
+                .toLowerCase()
+                .includes(searchValue.toLowerCase());
+            } else if (movie.name) {
+              return movie.name
+                .toLowerCase()
+                .includes(searchValue.toLowerCase());
+            }
+          });
+
+          if (searchResultsList) {
+            searchResultsList.innerHTML = "";
+            searchResultsList.classList.remove("hidden");
+            searchResultsList.classList.add("flex");
+            searchResults.forEach((movie: any) => {
+              const li = document.createElement("li");
+              if (movie.title) {
+                li.innerHTML = `
                       <a class="flex items-start gap-4" href=/peliculas/${movie.id}>
                         <img class="w-20 h-20 object-cover rounded-lg" src=https://image.tmdb.org/t/p/original${movie.poster_path} alt={movie.title} />
                         <div class="flex flex-col items-start">
@@ -139,8 +171,8 @@ const trendingMovies = movies;
                           <p class="text-gray-300">${formatDate(movie.release_date)}</p>
                         </div>
                       </a>`;
-                  } else if (movie.name){
-                    li.innerHTML = `
+              } else if (movie.name) {
+                li.innerHTML = `
                       <a class="flex items-start gap-4" href=/series/${movie.id}>
                         <img class="w-20 h-20 object-cover rounded-lg" src=https://image.tmdb.org/t/p/original${movie.poster_path} alt={movie.title} />
                         <div class="flex flex-col items-start">
@@ -148,16 +180,12 @@ const trendingMovies = movies;
                           <p class="text-gray-300">${formatDate(movie.first_air_date)}</p>
                         </div>
                       </a>`;
-                  }
-                  searchResultsList.appendChild(li);
-                });
               }
-            }
+              searchResultsList.appendChild(li);
+            });
+          }
         }
+      }
     });
-  })
-
-  
-
-
+  });
 </script>
