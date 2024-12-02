@@ -1,19 +1,26 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { getTopRatedSeries } from "@lib/tmdb";
 import SerieList from "@components/SerieList";
+import {
+  type Provider,
+  type SeriesResponse,
+  allProviders,
+  discoverSeriesByProvider,
+  getTVProviders,
+} from "@lib/api/series";
 
-// Obtén las primeras películas en el lado del servidor
-const initialSeries = await getTopRatedSeries(1);
-// Order by vote average
-initialSeries.series.sort((a: any, b: any) => b.vote_average - a.vote_average);
+const initialSeries: SeriesResponse = await discoverSeriesByProvider(
+  1,
+  allProviders.map((provider) => provider.provider_id.toString()).join("|")
+);
 ---
 
 <Layout title="Series">
-  <main>     
-      {/* Renderiza el componente de React */}
-      <SerieList initialSeries={initialSeries} initialType={'top-rated'} client:load />
+  <main>
+    <SerieList
+      initialSeries={initialSeries}
+      initialProvider={allProviders}
+      client:only="react"
+    />
   </main>
 </Layout>
-
-
