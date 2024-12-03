@@ -6,12 +6,15 @@ import {
   discoverMoviesByProvider,
   type MoviesResponse,
 } from "@lib/api/movies";
+import type { Provider } from "@lib/api/media";
 
 // Obtén las primeras películas en el lado del servidor
 
 const initialMovies: MoviesResponse = await discoverMoviesByProvider(
   1,
-  allProviders.map((provider) => provider.provider_id.toString()).join("|")
+  allProviders
+    .map((provider: Provider) => provider.provider_id.toString())
+    .join("|")
 );
 ---
 

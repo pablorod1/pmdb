@@ -5,10 +5,10 @@ import SimilarSeriesGlide from "@components/Sliders/SimilarSeriesGlide";
 import { formatDate, formatVoteAverage, formatVotes } from "src/common";
 import { ProgressSpinner } from "@components/UI/ProgressSpinner";
 import { getSerieById, type SerieDetails } from "@lib/api/series";
-import type { Cast, Crew } from "@lib/api/movies";
-import AnimatedButton from "@components/UI/AnimatedButton.astro";
-import PlayIcon from "@icons/PlayIcon.astro";
+import type { Crew, Cast } from "@lib/api/media";
+
 import VideoModal from "@components/UI/VideoModal.astro";
+import CreditsCastSection from "@components/CreditsCastSection.astro";
 
 const url = new URL(Astro.request.url);
 const id = Number(url.pathname.split("/")[2]);
@@ -16,9 +16,9 @@ const serie: SerieDetails = await getSerieById(id);
 ---
 
 <Layout title={serie.name}>
-  <main>
+  <main class="relative">
     <div
-      class="container-fluid px-10 py-20 flex justify-center items-center bg-cover bg-no-repeat"
+      class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat"
       style={`background-image: url(https://image.tmdb.org/t/p/original${serie.backdrop_path})`}
     >
       <div
@@ -103,20 +103,11 @@ const serie: SerieDetails = await getSerieById(id);
                   </div>
                 )
               }
-              {
+              <!-- {
                 serie.videos && serie.videos.length > 0 && (
-                  <AnimatedButton
-                    id={serie.videos[0].key}
-                    className="play-icon group animated-button flex items-center gap-2 text-nowrap"
-                  >
-                    Reproducir tráiler
-                    <PlayIcon
-                      id="play-icon"
-                      class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out"
-                    />
-                  </AnimatedButton>
+                  <VideoModal text="Ver Trailer" />
                 )
-              }
+              } -->
             </div>
           </div>
         </div>
@@ -141,37 +132,7 @@ const serie: SerieDetails = await getSerieById(id);
         </div>
       </div>
     </div>
-    <div class="px-10 py-20 flex justify-center items-center w-full">
-      <div class="flex flex-col gap-y-4">
-        <h2 class="text-white font-bold text-3xl">Reparto</h2>
-        <div class="grid grid-cols-3 md:grid-cols-5 gap-12 w-full">
-          {
-            serie.credits.cast
-              .sort((a: Cast, b: Cast) => b.popularity - a.popularity)
-              .slice(0, 10)
-              .map((credit: Cast) => (
-                <div class="flex flex-col items-center gap-2">
-                  <div class="max-w-20 w-full rounded-xl overflow-hidden">
-                    <img
-                      class="w-full object-cover"
-                      src={`https://image.tmdb.org/t/p/original${credit.profile_path}`}
-                      alt={credit.name}
-                    />
-                  </div>
-                  <div class="flex flex-col items-center justify-center">
-                    <span class="text-white text-sm text-center">
-                      {credit.name}
-                    </span>
-                    <span class="text-gray-300 text-sm text-center">
-                      {credit.character.split("/", 1)}
-                    </span>
-                  </div>
-                </div>
-              ))
-          }
-        </div>
-      </div>
-    </div>
+    <CreditsCastSection item={serie} />
     {
       serie.providers && serie.providers.length > 0 && (
         <SimilarSeriesGlide
@@ -180,7 +141,6 @@ const serie: SerieDetails = await getSerieById(id);
         />
       )
     }
-    <VideoModal className="-top-[460px]" />
   </main>
 </Layout>
 

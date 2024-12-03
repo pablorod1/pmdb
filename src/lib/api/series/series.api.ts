@@ -1,11 +1,5 @@
-import type {
-  Credits,
-  Provider,
-  SerieDetails,
-  SeriesResponse,
-  Video,
-} from "./series.api-model";
-
+import type { SerieDetails, SeriesResponse } from "./series.api-model";
+import type { Provider, Video, Credits } from "../media";
 const API_KEY = "0a233d84fc55a74ae5753ab6a5e22375";
 const SERIE_URL = "https://api.themoviedb.org/3/tv";
 
@@ -54,7 +48,7 @@ export const getSerieWhatchProviders = async (
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    return data.results.ES.flatrate;
+    return data.results.ES;
   } catch (error) {
     console.error("Error fetching data", error);
   }

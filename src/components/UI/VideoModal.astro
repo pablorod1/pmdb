@@ -1,28 +1,52 @@
 ---
-import CloseIcon from "../../icons/CloseIcon.astro";
-
-const { className } = Astro.props;
+const { videoId } = Astro.props;
 ---
 
-<div
-  id="video-modal"
-  class="fixed top-0 left-0 bg-black bg-opacity-70 hidden z-10 pb-4 h-screen w-screen"
->
-  <div class="relative flex justify-between items-center p-4 max-w-7xl w-full">
-    <h2 class="movie-trailer text-2xl font-bold text-center text-white"></h2>
-    <button
-      id="close-modal"
-      class="text-gray-600 hover:text-gray-900 bg-white rounded-full p-2"
-      ><CloseIcon class="size-8" /></button
-    >
-  </div>
-  <div class="bg-white p-4 rounded-lg max-w-7xl w-full h-[80dvh]">
-    <div class="relative h-full">
-      <iframe
-        id="video-frame"
-        class="w-full h-[95dvh] lg:h-full"
-        src=""
-        allowfullscreen></iframe>
-    </div>
-  </div>
+<div>
+  <button
+    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    id="open-modal"
+  >
+    Abrir Video
+  </button>
+
+  {
+    (
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white w-11/12 max-w-2xl p-6 rounded shadow-lg">
+          <button
+            class="absolute top-2 right-2 bg-gray-300 rounded-full p-1 hover:bg-gray-400"
+            id="close-modal"
+          >
+            ✕
+          </button>
+          <iframe
+            id="video"
+            class="w-full aspect-video"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            title="YouTube video"
+            allowfullscreen
+          />
+        </div>
+      </div>
+    )
+  }
 </div>
+
+<!-- <script>
+  const openModal = document.getElementById("open-modal");
+  const closeModal = document.getElementById("close-modal");
+  const video = document.getElementById("video");
+
+  if (openModal) {
+    openModal.addEventListener("click", () => {
+      if (video && video instanceof HTMLIFrameElement) {
+        document.body.style.overflow = "hidden";
+      }
+    });
+  }
+
+  closeModal.addEventListener("click", () => {
+    document.body.style.overflow = "auto";
+  });
+</script> -->

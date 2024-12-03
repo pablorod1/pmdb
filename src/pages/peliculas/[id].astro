@@ -1,10 +1,6 @@
 ---
 import GenrePill from "@components/UI/GenrePill.astro";
 import Layout from "@layouts/Layout.astro";
-
-import VideoModal from "@components/UI/VideoModal.astro";
-import PlayIcon from "@icons/PlayIcon.astro";
-import AnimatedButton from "@components/UI/AnimatedButton.astro";
 import {
   formatDate,
   formatRuntime,
@@ -12,13 +8,11 @@ import {
   formatVotes,
 } from "src/common";
 import { ProgressSpinner } from "@components/UI/ProgressSpinner";
-import {
-  getMovieById,
-  type Video,
-  type MovieDetails,
-  type Crew,
-  type Cast,
-} from "@lib/api/movies";
+import { getMovieById, type MovieDetails } from "@lib/api/movies";
+import type { Crew } from "@lib/api/media";
+import SimilarMoviesGlide from "@components/Sliders/SimilarMoviesGlide";
+import CreditsCastSection from "@components/CreditsCastSection.astro";
+import VideoModal from "@components/UI/VideoModal.astro";
 
 const url = new URL(Astro.request.url);
 const id = Number(url.pathname.split("/")[2]);
@@ -28,7 +22,7 @@ const movie: MovieDetails = await getMovieById(id);
 <Layout title={movie.title}>
   <main>
     <div
-      class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat xl:px-0 md:px-10"
+      class="container-fluid px-4 py-20 flex justify-center items-center bg-cover bg-no-repeat"
       style={`background-image: url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`}
     >
       <div
@@ -104,20 +98,11 @@ const movie: MovieDetails = await getMovieById(id);
                   </div>
                 )
               }
-              {
+              <!-- {
                 movie.videos && movie.videos.length > 0 && (
-                  <AnimatedButton
-                    id={movie.videos[0].key}
-                    className="play-icon group animated-button flex items-center gap-2 text-nowrap"
-                  >
-                    Reproducir tráiler
-                    <PlayIcon
-                      id="play-icon"
-                      class="size-6 fill-[var(--primary-color)] group-hover:fill-[var(--background-color)] transition-all duration-300 ease-in-out"
-                    />
-                  </AnimatedButton>
+                  <VideoModal text="Reproducir tráiler" />
                 )
-              }
+              } -->
             </div>
           </div>
         </div>
@@ -142,59 +127,15 @@ const movie: MovieDetails = await getMovieById(id);
         </div>
       </div>
     </div>
-    <div class="px-10 py-20 flex justify-center items-center w-full">
-      <div class="flex flex-col w-full gap-y-4">
-        <h2 class="text-white font-bold text-3xl">Reparto</h2>
-        <div class="grid grid-cols-3 md:grid-cols-5 gap-12 w-full">
-          {
-            movie.credits.cast
-              .sort((a: Cast, b: Cast) => b.popularity - a.popularity)
-              .slice(0, 10)
-              .map((credit: any) => (
-                <div class="flex flex-col items-center gap-2">
-                  <div class="max-w-20 w-full rounded-xl overflow-hidden">
-                    <img
-                      class="w-full object-cover"
-                      src={`https://image.tmdb.org/t/p/original${credit.profile_path}`}
-                      alt={credit.name}
-                    />
-                  </div>
-                  <div class="flex flex-col items-center justify-center">
-                    <span class="text-white text-sm text-center">
-                      {credit.name}
-                    </span>
-                    <span class="text-gray-300 text-sm text-center">
-                      {credit.character.split("/", [1])}
-                    </span>
-                  </div>
-                </div>
-              ))
-          }
-        </div>
-      </div>
-    </div>
+    <CreditsCastSection item={movie} />
     {
-      movie.videos && movie.videos.length > 0 && (
-        <div class="px-10 py-10 flex justify-center items-start w-full ">
-          <div class="flex flex-col gap-y-4 w-full">
-            <h2 class="text-white font-bold text-3xl">Videos</h2>
-            <div class="flex items-center gap-4 overflow-scroll w-[96dvw]">
-              {movie.videos.map((video: Video) => (
-                <div class="flex flex-col items-center gap-4">
-                  <iframe
-                    class=""
-                    src={`https://www.youtube.com/embed/${video.key}?enablejsapi=1`}
-                    allowfullscreen
-                  />
-                  <h3 class="text-white font-semibold">{video.name}</h3>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      movie.providers && movie.providers.length > 0 && (
+        <SimilarMoviesGlide
+          client:only="react"
+          id={movie.providers[0].provider_id}
+        />
       )
     }
-    <VideoModal className="-top-[460px]" />
   </main>
 </Layout>
 

@@ -15,7 +15,6 @@ const SearchBar: React.FC = () => {
     const fetchMovies = async () => {
       try {
         const newMedia = await getPopularMoviesAndSeries();
-        console.log(newMedia);
         setMedia(newMedia.media);
       } catch (error) {
         console.error("Error fetching movies:", error);

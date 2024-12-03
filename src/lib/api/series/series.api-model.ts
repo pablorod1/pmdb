@@ -1,3 +1,4 @@
+import type { Credits, Genre, Provider, Video } from "../media";
 import { getTVProviders } from "./series.api";
 
 export const TYPES = ["popular", "top_rated", "on_the_air", "airing_today"];
@@ -76,11 +77,6 @@ export interface CreatedBy {
   profile_path: string;
 }
 
-export interface Genre {
-  id: number;
-  name: string;
-}
-
 export interface Network {
   name: string;
   id: number;
@@ -96,53 +92,4 @@ export interface Season {
   overview: string;
   poster_path: string;
   season_number: number;
-}
-
-export interface Provider {
-  provider_id: number;
-  provider_name: string;
-  display_priority: number;
-  logo_path: string;
-  display_priorities: number[];
-}
-
-export interface Video {
-  id: number;
-  name: string;
-  key: string;
-}
-
-export interface Credits {
-  id: number;
-  cast: Cast[];
-  crew: Crew[];
-}
-
-export interface Cast {
-  adult: boolean;
-  gender: number;
-  id: number;
-  known_for_department: string;
-  name: string;
-  original_name: string;
-  popularity: number;
-  profile_path: string;
-  cast_id: number;
-  character: string;
-  credit_id: string;
-  order: number;
-}
-
-export interface Crew {
-  adult: boolean;
-  gender: number;
-  id: number;
-  known_for_department: string;
-  name: string;
-  original_name: string;
-  popularity: number;
-  profile_path: string;
-  credit_id: string;
-  department: string;
-  job: string;
 }

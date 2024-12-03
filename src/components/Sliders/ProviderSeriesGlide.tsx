@@ -5,13 +5,14 @@ import "@glidejs/glide/dist/css/glide.theme.min.css";
 import {
   discoverSeriesByProvider,
   PROVIDERS,
-  type Provider,
   type Serie,
 } from "@lib/api/series";
-import { formatDate, formatVoteAverage } from "src/common";
-import { ProgressSpinner } from "@components/UI/ProgressSpinner";
+import type { Provider } from "@lib/api/media";
+
 import Loader from "@components/UI/Loader";
 import { initFlowbite } from "flowbite";
+import SliderMediaCard from "@components/UI/SliderMediaCard";
+import ProvidersDropdown from "@components/UI/ProvidersDropdown";
 
 const ProviderSeriesGlide: React.FC = () => {
   const [series, setSeries] = React.useState<Serie[]>([]);
@@ -67,7 +68,13 @@ const ProviderSeriesGlide: React.FC = () => {
           perView: 10,
           gap: 30,
           breakpoints: {
+            2000: {
+              perView: 7,
+            },
             1600: {
+              perView: 6,
+            },
+            1200: {
               perView: 5,
             },
             1024: {
@@ -118,96 +125,21 @@ const ProviderSeriesGlide: React.FC = () => {
     <div className="flex flex-col ps-6 ">
       <div className="flex items-center gap-4">
         <h1 className="flex items-center text-white font-bold text-3xl">
-          Top series en {provider.provider_name}
+          Top 20 series de {provider.provider_name}
         </h1>
-
-        <button
-          id="providerSeriesDropdownButton"
-          data-dropdown-toggle="providerSeriesDropdown"
-          className="text-white bg-[var(--background-color)]  focus:outline-none  font-medium rounded-lg text-sm text-center inline-flex items-center capitalize"
-          type="button"
-        >
-          <img
-            className="size-10 rounded-lg"
-            src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
-          />
-          <svg
-            className="w-2.5 h-2.5 ms-3"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="m1 1 4 4 4-4"
-            />
-          </svg>
-        </button>
-
-        <div
-          id="providerSeriesDropdown"
-          className="z-10 hidden max-w-52 w-full bg-[var(--background-color)] shadow-[0px_0px_4px_rgba(203,196,0,14)] divide-y divide-gray-100 rounded-lg"
-        >
-          <ul
-            className="py-2 text-sm text-white"
-            aria-labelledby="providerSeriesDropdownButton"
-          >
-            {PROVIDERS.map((provider: Provider, index: number) => (
-              <li key={index}>
-                <button
-                  onClick={() => handleProviderChange(provider)}
-                  type="button"
-                  className="flex items-center gap-2 w-full text-left px-6 py-2 hover:bg-[--primary-color] hover:text-[var(--background-color)] transition-colors duration-200 ease-in-out"
-                >
-                  <img
-                    className="size-6 rounded-md"
-                    src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
-                  />
-                  <span>{provider.provider_name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ProvidersDropdown
+          buttonId="providerSeriesDropdownButton"
+          dropdownId="providerSeriesDropdown"
+          provider={provider}
+          handleProviderChange={handleProviderChange}
+        />
       </div>
       <div className="provider-series-glide relative py-12">
         <div className="glide__track mx-12" data-glide-el="track">
           <ul className="glide__slides">
             {series.map((serie: Serie, index: number) => (
               <li key={index} className="glide__slide h-full">
-                <a
-                  href={`/series/${serie.id}`}
-                  no-opener="true"
-                  no-referer="true"
-                  data-id={serie.id}
-                  className="relative flex flex-col items-start justify-center gap-2"
-                >
-                  <div className="movie-img-container relative flex items-center justify-center rounded-xl overflow-hidden cursor-pointer ">
-                    <img
-                      className="w-full"
-                      src={`https://image.tmdb.org/t/p/original${serie.poster_path}`}
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center w-full">
-                    <div className="flex flex-col items-start ">
-                      <h2 className="text-white text-sm font-light">
-                        {serie.name}
-                      </h2>
-                      <p className="text-gray-300 text-sm font-light">
-                        {formatDate(serie.first_air_date)}
-                      </p>
-                    </div>
-                    <ProgressSpinner
-                      percentage={formatVoteAverage(serie.vote_average)}
-                      size={40}
-                    />
-                  </div>
-                </a>
+                <SliderMediaCard item={serie} />
               </li>
             ))}
           </ul>

@@ -15,7 +15,6 @@ const TeasersGlide: React.FC = () => {
     const fetchMovies = async () => {
       try {
         const movies = await getMoviesVideos();
-        console.log("movies", movies);
         setMovies(movies);
         setLoading(false);
       } catch (error) {

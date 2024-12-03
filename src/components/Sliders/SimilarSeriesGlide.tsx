@@ -5,13 +5,12 @@ import "@glidejs/glide/dist/css/glide.theme.min.css";
 import {
   allProviders,
   discoverSeriesByProvider,
-  type Provider,
   type Serie,
 } from "@lib/api/series";
-import { formatDate, formatVoteAverage } from "src/common";
-import { ProgressSpinner } from "@components/UI/ProgressSpinner";
+import type { Provider } from "@lib/api/media";
 import Loader from "@components/UI/Loader";
 import { initFlowbite } from "flowbite";
+import SliderMediaCard from "@components/UI/SliderMediaCard";
 
 interface Props {
   id: number;
@@ -33,9 +32,11 @@ const SimilarSeriesGlide: React.FC<Props> = (props) => {
           ({} as Provider);
         setProvider(newProvider);
         setSeries(series.series);
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       } catch (error) {
-        console.error("Error fetching movies:", error);
+        console.error("Error fetching series:", error);
         setLoading(false);
       }
     };
@@ -80,7 +81,6 @@ const SimilarSeriesGlide: React.FC<Props> = (props) => {
     };
 
     initializeGlide();
-    initFlowbite();
 
     return () => {
       if (glideRef.current) {
@@ -90,12 +90,6 @@ const SimilarSeriesGlide: React.FC<Props> = (props) => {
     };
   }, [loading, series]);
 
-  if (loading)
-    return (
-      <div className="w-full h-auto flex flex-col justify-center items-center gap-4 my-12">
-        <Loader />
-      </div>
-    );
   if (series.length === 0) {
     return (
       <div className="bg-gray-200 mb-8 py-2 px-4 w-full">
@@ -111,50 +105,28 @@ const SimilarSeriesGlide: React.FC<Props> = (props) => {
           Más de {provider.provider_name}
         </h1>
         <img
-          className="size-12 rounded-md"
+          className="size-12 rounded-lg"
           src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
           alt=""
         />
       </div>
-      <div className="similar-series-glide relative py-12">
-        <div className="glide__track mx-12" data-glide-el="track">
-          <ul className="glide__slides">
-            {series.map((serie: Serie, index: number) => (
-              <li key={index} className="glide__slide h-full">
-                <a
-                  href={`/series/${serie.id}`}
-                  no-opener="true"
-                  no-referer="true"
-                  data-id={serie.id}
-                  className="relative flex flex-col items-start justify-center gap-2"
-                >
-                  <div className="movie-img-container relative flex items-center justify-center rounded-xl overflow-hidden cursor-pointer ">
-                    <img
-                      className="w-full"
-                      src={`https://image.tmdb.org/t/p/original${serie.poster_path}`}
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="flex justify-between items-center w-full">
-                    <div className="flex flex-col items-start ">
-                      <h2 className="text-white text-sm font-light">
-                        {serie.name}
-                      </h2>
-                      <p className="text-gray-300 text-sm font-light">
-                        {formatDate(serie.first_air_date)}
-                      </p>
-                    </div>
-                    <ProgressSpinner
-                      percentage={formatVoteAverage(serie.vote_average)}
-                      size={40}
-                    />
-                  </div>
-                </a>
-              </li>
-            ))}
-          </ul>
+      {!loading ? (
+        <div className="similar-series-glide relative py-12">
+          <div className="glide__track mx-12" data-glide-el="track">
+            <ul className="glide__slides">
+              {series.map((serie: Serie, index: number) => (
+                <li key={index} className="glide__slide h-full">
+                  <SliderMediaCard item={serie} />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full h-auto flex flex-col justify-center items-center gap-4 my-12">
+          <Loader />
+        </div>
+      )}
     </div>
   );
 };

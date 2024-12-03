@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "jsx": "react-jsx",  // o "react" dependiendo de tu versión de React
+    "jsx": "react-jsx", // o "react" dependiendo de tu versión de React
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,7 +12,7 @@
       "@icons/*": ["src/icons/*"],
       "@lib/*": ["src/lib/*"],
       "@pages/*": ["src/pages/*"],
-      "@layouts/*": ["src/layouts/*"],
+      "@layouts/*": ["src/layouts/*"]
     }
   }
 }
