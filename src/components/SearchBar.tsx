@@ -1,10 +1,11 @@
+import { getPopularMoviesAndSeries, searchMediabyName } from "@lib/api/media";
 import { getMovieByName, type Movie } from "@lib/api/movies";
-import { getAllMoviesAndSeries, getTrendingMoviesWeek } from "@lib/tmdb";
+import type { Serie } from "@lib/api/series";
 import React from "react";
 import { formatDate } from "src/common";
 
 const SearchBar: React.FC = () => {
-  const [movies, setMovies] = React.useState<Movie[]>([]);
+  const [media, setMedia] = React.useState<(Movie | Serie)[]>([]);
   const searchWrapper = document.getElementById("searchWrapper");
   const searchContainer = document.getElementById("searchContainer");
   const html = document.querySelector("html");
@@ -13,10 +14,9 @@ const SearchBar: React.FC = () => {
   React.useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const movies: Movie[] = await getTrendingMoviesWeek(1).then(
-          (movies) => movies.movies
-        );
-        setMovies(movies);
+        const newMedia = await getPopularMoviesAndSeries();
+        console.log(newMedia);
+        setMedia(newMedia.media);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
@@ -29,16 +29,14 @@ const SearchBar: React.FC = () => {
     const query = event.target.value;
     if (query && query !== "") {
       try {
-        const newMovies = await getMovieByName(query);
-        setMovies(newMovies);
+        const newMedia = await searchMediabyName(query);
+        setMedia(newMedia.media);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
     } else {
-      const movies: Movie[] = await getTrendingMoviesWeek(1).then(
-        (movies) => movies.movies
-      );
-      setMovies(movies);
+      const newMedia = await getPopularMoviesAndSeries();
+      setMedia(newMedia.media);
     }
   };
 
@@ -97,7 +95,7 @@ const SearchBar: React.FC = () => {
 
       <div
         id="searchWrapper"
-        className="flex opacity-0 -z-50 w-screen h-screen bg-black bg-opacity-60 absolute top-0 left-0 justify-center pt-40 "
+        className="flex opacity-0 -z-50 w-screen h-screen bg-black bg-opacity-60 absolute top-0 left-0 justify-center pt-40 px-12 "
       >
         <div>
           <button
@@ -154,28 +152,47 @@ const SearchBar: React.FC = () => {
                 </svg>
                 Tendencias
               </h2>
-              {movies.map((movie: Movie, index: number) => (
+              {media.map((item: Movie | Serie, index: number) => (
                 <li key={index}>
                   <a
                     className="flex items-start gap-4"
-                    href={`/peliculas/${movie.id}`}
+                    href={
+                      "title" in item
+                        ? `/peliculas/${item.id}`
+                        : `/series/${item.id}`
+                    }
                   >
                     <img
-                      className="w-20 h-20 object-cover rounded-lg"
-                      src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-                      alt={movie.title || movie.name}
+                      className="aspect-[2/3] max-w-24 object-cover rounded-lg"
+                      src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
+                      alt={"title" in item ? item.title : item.name}
                     />
-                    <div className="flex flex-col items-start">
-                      <h3 className="text-white font-semibold">
-                        {movie.title || movie.name}
-                      </h3>
-                      <p className="text-gray-300">
-                        {movie.release_date
-                          ? formatDate(movie.release_date)
-                          : movie.first_air_date
-                          ? formatDate(movie.first_air_date)
-                          : ""}
-                      </p>
+                    <div className="flex flex-col items-start gap-4">
+                      <div className="flex flex-col">
+                        <h3 className="text-white font-semibold">
+                          {"title" in item ? item.title : item.name}
+                        </h3>
+                        <p className="text-gray-300">
+                          {"release_date" in item
+                            ? formatDate(item.release_date)
+                            : formatDate(item.first_air_date)}
+                        </p>
+                      </div>
+                      <div>
+                        <ul className="flex items-center gap-2">
+                          {item.providers &&
+                            item.providers.length > 0 &&
+                            item.providers.map((provider, index) => (
+                              <li key={index}>
+                                <img
+                                  className="size-10 rounded-lg"
+                                  src={`https://image.tmdb.org/t/p/original${provider.logo_path}`}
+                                  alt={provider.provider_name}
+                                />
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
                     </div>
                   </a>
                 </li>

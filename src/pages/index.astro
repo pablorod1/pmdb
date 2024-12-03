@@ -7,6 +7,7 @@ import ProviderMoviesGlide from "@components/Sliders/ProviderMoviesGlide";
 import PopularMoviesGlide from "@components/Sliders/PopularMoviesGlide";
 import ProviderSeriesGlide from "@components/Sliders/ProviderSeriesGlide";
 import SectionContainer from "@components/SectionContainer.astro";
+import { getPopularMoviesAndSeries } from "@lib/api/media/media.api";
 ---
 
 <Layout title="Inicio">
@@ -30,7 +31,6 @@ import SectionContainer from "@components/SectionContainer.astro";
     <SectionContainer>
       <PopularMoviesGlide client:load />
     </SectionContainer>
-
     <VideoModal />
   </main>
 </Layout>

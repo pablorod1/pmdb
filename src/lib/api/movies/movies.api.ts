@@ -129,7 +129,7 @@ export const getMovieById = async (id: number): Promise<MovieDetails> => {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    const providers = await getWhatchProviders(id);
+    const providers = await getMovieWhatchProviders(id);
     const videos = await getMovieVideos(id);
     const credits = await getMovieCredits(id);
     return {
@@ -145,7 +145,9 @@ export const getMovieById = async (id: number): Promise<MovieDetails> => {
   return {} as MovieDetails;
 };
 
-const getWhatchProviders = async (id: number): Promise<Provider> => {
+export const getMovieWhatchProviders = async (
+  id: number
+): Promise<Provider> => {
   try {
     const response = await fetch(
       `${MOVIE_URL}/${id}/watch/providers?api_key=${API_KEY}`

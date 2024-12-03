@@ -43,7 +43,9 @@ const getSerieVideos = async (id: number): Promise<Video[]> => {
   return [];
 };
 
-const getWhatchProviders = async (id: number): Promise<Provider> => {
+export const getSerieWhatchProviders = async (
+  id: number
+): Promise<Provider> => {
   try {
     const response = await fetch(
       `${SERIE_URL}/${id}/watch/providers?api_key=${API_KEY}`
@@ -120,7 +122,7 @@ export const getSerieById = async (id: number): Promise<SerieDetails> => {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
-    const providers = await getWhatchProviders(id);
+    const providers = await getSerieWhatchProviders(id);
     const videos = await getSerieVideos(id);
     const credits = await getSerieCredits(id);
     return {

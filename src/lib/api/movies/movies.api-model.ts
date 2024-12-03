@@ -33,9 +33,8 @@ export interface Movie {
   video: boolean;
   vote_average: number;
   vote_count: number;
-  name?: string;
-  first_air_date?: string;
   videos: Video[];
+  providers: Provider[];
 }
 
 export interface MovieDetails {
