@@ -1,8 +1,8 @@
-import { getPopularMoviesAndSeries, searchMediabyName } from "@lib/api/media";
-import { getMovieByName, type Movie } from "@lib/api/movies";
-import type { Serie } from "@lib/api/series";
 import React from "react";
 import { formatDate } from "src/common";
+import { getPopularMoviesAndSeries, searchMediabyName } from "@lib/api/media";
+import { type Movie } from "@lib/api/movies";
+import type { Serie } from "@lib/api/series";
 
 const SearchBar: React.FC = () => {
   const [media, setMedia] = React.useState<(Movie | Serie)[]>([]);
