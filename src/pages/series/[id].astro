@@ -7,7 +7,7 @@ import { ProgressSpinner } from "@components/UI/ProgressSpinner";
 import { getSerieById, type SerieDetails } from "@lib/api/series";
 import type { Crew, Cast } from "@lib/api/media";
 
-import VideoModal from "@components/UI/VideoModal.astro";
+import VideoModalComponent from "@components/UI/VideoModal";
 import CreditsCastSection from "@components/CreditsCastSection.astro";
 
 const url = new URL(Astro.request.url);
@@ -103,11 +103,11 @@ const serie: SerieDetails = await getSerieById(id);
                   </div>
                 )
               }
-              <!-- {
+              {
                 serie.videos && serie.videos.length > 0 && (
-                  <VideoModal text="Ver Trailer" />
+                  <VideoModalComponent videoId={serie.videos[0].key} />
                 )
-              } -->
+              }
             </div>
           </div>
         </div>
@@ -163,40 +163,3 @@ const serie: SerieDetails = await getSerieById(id);
     z-index: 1;
   }
 </style>
-
-<script>
-  const playIcon = document.querySelector(".play-icon");
-  const videoModal = document.getElementById("video-modal");
-  const closeVideoModal = document.getElementById("close-modal");
-  const animatedButton = document.querySelector(".animated-button");
-  const trailerKey = animatedButton?.getAttribute("id");
-  const movieTitle = document.getElementById("movie-title");
-  const modalTitle = document.querySelector(".movie-trailer");
-
-  playIcon?.addEventListener("click", () => {
-    if (modalTitle && movieTitle) {
-      modalTitle.textContent = movieTitle.textContent;
-    }
-    videoModal
-      ?.querySelector("iframe")
-      ?.setAttribute("src", `https://www.youtube.com/embed/${trailerKey}`);
-    videoModal?.classList.remove("hidden");
-    videoModal?.classList.add(
-      "flex",
-      "justify-center",
-      "items-center",
-      "flex-col"
-    );
-  });
-
-  closeVideoModal?.addEventListener("click", () => {
-    videoModal?.classList.add("hidden");
-    videoModal?.classList.remove(
-      "flex",
-      "justify-start",
-      "items-start",
-      "flex-col"
-    );
-    videoModal?.querySelector("iframe")?.setAttribute("src", "");
-  });
-</script>

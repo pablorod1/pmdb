@@ -12,7 +12,7 @@ import { getMovieById, type MovieDetails } from "@lib/api/movies";
 import type { Crew } from "@lib/api/media";
 import SimilarMoviesGlide from "@components/Sliders/SimilarMoviesGlide";
 import CreditsCastSection from "@components/CreditsCastSection.astro";
-import VideoModal from "@components/UI/VideoModal.astro";
+import VideoModalComponent from "@components/UI/VideoModal";
 
 const url = new URL(Astro.request.url);
 const id = Number(url.pathname.split("/")[2]);
@@ -98,11 +98,14 @@ const movie: MovieDetails = await getMovieById(id);
                   </div>
                 )
               }
-              <!-- {
+              {
                 movie.videos && movie.videos.length > 0 && (
-                  <VideoModal text="Reproducir tráiler" />
+                  <VideoModalComponent
+                    client:only="react"
+                    videoId={movie.videos[0].key}
+                  />
                 )
-              } -->
+              }
             </div>
           </div>
         </div>
@@ -158,40 +161,3 @@ const movie: MovieDetails = await getMovieById(id);
     z-index: 1;
   }
 </style>
-
-<script>
-  const playIcon = document.querySelector(".play-icon");
-  const videoModal = document.getElementById("video-modal");
-  const closeVideoModal = document.getElementById("close-modal");
-  const animatedButton = document.querySelector(".animated-button");
-  const trailerKey = animatedButton?.getAttribute("id");
-  const movieTitle = document.getElementById("movie-title");
-  const modalTitle = document.querySelector(".movie-trailer");
-
-  playIcon?.addEventListener("click", () => {
-    if (modalTitle && movieTitle) {
-      modalTitle.textContent = movieTitle.textContent;
-    }
-    videoModal
-      ?.querySelector("iframe")
-      ?.setAttribute("src", `https://www.youtube.com/embed/${trailerKey}`);
-    videoModal?.classList.remove("hidden");
-    videoModal?.classList.add(
-      "flex",
-      "justify-center",
-      "items-center",
-      "flex-col"
-    );
-  });
-
-  closeVideoModal?.addEventListener("click", () => {
-    videoModal?.classList.add("hidden");
-    videoModal?.classList.remove(
-      "flex",
-      "justify-start",
-      "items-start",
-      "flex-col"
-    );
-    videoModal?.querySelector("iframe")?.setAttribute("src", "");
-  });
-</script>
