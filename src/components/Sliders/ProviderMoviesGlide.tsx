@@ -27,7 +27,7 @@ const ProviderMoviesGlide: React.FC = () => {
     try {
       const newMovies = await discoverMoviesByProvider(
         1,
-        newProvider.provider_id
+        newProvider.provider_id.toString()
       );
       setMovies(newMovies.movies);
       setLoading(false);
@@ -42,7 +42,7 @@ const ProviderMoviesGlide: React.FC = () => {
       try {
         const newMovies = await discoverMoviesByProvider(
           1,
-          provider.provider_id
+          provider.provider_id.toString()
         );
         setMovies(newMovies.movies);
         setLoading(false);
