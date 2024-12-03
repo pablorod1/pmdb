@@ -3,13 +3,12 @@ import React from "react";
 import { formatRating, formatVotes } from "src/common";
 import { initFlowbite } from "flowbite";
 import {
-  type Provider,
   type Serie,
   type SeriesResponse,
   PROVIDERS,
   discoverSeriesByProvider,
 } from "@lib/api/series";
-
+import type { Provider } from "@lib/api/media";
 interface Props {
   initialSeries: SeriesResponse;
   initialProvider: Provider[];

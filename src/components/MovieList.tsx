@@ -2,13 +2,12 @@ import React from "react";
 import {
   type Movie,
   type MoviesResponse,
-  type Provider,
   discoverMoviesByProvider,
   PROVIDERS,
 } from "@lib/api/movies";
 import { formatRating, formatVotes } from "src/common";
 import { initFlowbite } from "flowbite";
-
+import type { Provider } from "@lib/api/media";
 interface Props {
   initialMovies: MoviesResponse;
   initialProvider: Provider[];
