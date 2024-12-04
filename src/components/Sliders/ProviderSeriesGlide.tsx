@@ -3,12 +3,12 @@ import * as Glide from "@glidejs/glide";
 import "@glidejs/glide/dist/css/glide.core.min.css";
 import "@glidejs/glide/dist/css/glide.theme.min.css";
 import {
+  allProviders,
   discoverSeriesByProvider,
   PROVIDERS,
   type Serie,
 } from "@lib/api/series";
 import type { Provider } from "@lib/api/media";
-
 import Loader from "@components/UI/Loader";
 import { initFlowbite } from "flowbite";
 import SliderMediaCard from "@components/UI/SliderMediaCard";
@@ -16,7 +16,9 @@ import ProvidersDropdown from "@components/UI/ProvidersDropdown";
 
 const ProviderSeriesGlide: React.FC = () => {
   const [series, setSeries] = React.useState<Serie[]>([]);
-  const [provider, setProvider] = React.useState<Provider>(PROVIDERS[0]);
+  const [provider, setProvider] = React.useState<Provider>(
+    PROVIDERS[0] as Provider
+  );
   const [loading, setLoading] = React.useState<boolean>(true);
   const glideRef = React.useRef<Glide | null>(null);
 
@@ -24,12 +26,14 @@ const ProviderSeriesGlide: React.FC = () => {
     setProvider(newProvider);
     setLoading(true);
     try {
-      const series = await discoverSeriesByProvider(
+      const newSeries = await discoverSeriesByProvider(
         1,
         newProvider.provider_id.toString()
       );
-      setSeries(series.series);
-      setLoading(false);
+      setSeries(newSeries.series);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Error fetching series:", error);
       setLoading(false);
@@ -39,12 +43,14 @@ const ProviderSeriesGlide: React.FC = () => {
   React.useEffect(() => {
     const fetchSeries = async () => {
       try {
-        const series = await discoverSeriesByProvider(
+        const newSeries = await discoverSeriesByProvider(
           1,
           provider.provider_id.toString()
         );
-        setSeries(series.series);
-        setLoading(false);
+        setSeries(newSeries.series);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       } catch (error) {
         console.error("Error fetching series:", error);
         setLoading(false);

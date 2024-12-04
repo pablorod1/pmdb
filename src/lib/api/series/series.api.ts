@@ -138,7 +138,7 @@ export const discoverSeriesByProvider = async (
 ): Promise<SeriesResponse> => {
   try {
     const response = await fetch(
-      `https://api.themoviedb.org/3/discover/tv?language=es-ES&page=${page}&with_watch_providers=${provider}&watch_region=ES&sort_by=popularity.desc&api_key=0a233d84fc55a74ae5753ab6a5e22375`
+      `https://api.themoviedb.org/3/discover/tv?language=es-ES&page=${page}&with_watch_providers=${provider}&watch_region=ES&sort_by=popularity.desc&api_key=${API_KEY}`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -161,7 +161,7 @@ export const discoverSeriesByProvider = async (
 export const getTVProviders = async (): Promise<Provider[]> => {
   try {
     const response = await fetch(
-      `https://api.themoviedb.org/3/watch/providers/tv?language=es-ES&watch_region=ES&sort_by=display_priority.desc&api_key=${API_KEY}`
+      `https://api.themoviedb.org/3/watch/providers/movie?language=es-ES&watch_region=ES&sort_by=display_priority.desc&api_key=${API_KEY}`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");

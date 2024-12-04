@@ -1,27 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import SerieList from "@components/SerieList";
-import {
-  type SeriesResponse,
-  allProviders,
-  discoverSeriesByProvider,
-} from "@lib/api/series";
-import type { Provider } from "@lib/api/media";
-
-const initialSeries: SeriesResponse = await discoverSeriesByProvider(
-  1,
-  allProviders
-    .map((provider: Provider) => provider.provider_id.toString())
-    .join("|")
-);
 ---
 
 <Layout title="Series">
   <main>
-    <SerieList
-      initialSeries={initialSeries}
-      initialProvider={allProviders}
-      client:only="react"
-    />
+    <SerieList client:only="react" />
   </main>
 </Layout>

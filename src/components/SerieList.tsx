@@ -6,24 +6,43 @@ import {
   type Serie,
   type SeriesResponse,
   PROVIDERS,
+  allProviders,
   discoverSeriesByProvider,
 } from "@lib/api/series";
 import type { Provider } from "@lib/api/media";
-interface Props {
-  initialSeries: SeriesResponse;
-  initialProvider: Provider[];
-}
+import Loader from "./UI/Loader";
 
-const SerieList: React.FC<Props> = (props) => {
-  const { initialSeries, initialProvider } = props;
-  const [series, setSeries] = React.useState<Serie[]>(initialSeries.series);
-  const [provider, setProvider] = React.useState<Provider[]>(initialProvider);
+const SerieList: React.FC = () => {
+  const [series, setSeries] = React.useState<Serie[]>([]);
+  const [provider, setProvider] = React.useState<Provider[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [page, setPage] = React.useState(1);
-  const [totalPages, setTotalPages] = React.useState(initialSeries.totalPages);
+  const [totalPages, setTotalPages] = React.useState(1);
 
   React.useEffect(() => {
+    const fetchSeries = async () => {
+      try {
+        const series = await discoverSeriesByProvider(
+          1,
+          allProviders
+            .map((provider: Provider) => provider.provider_id.toString())
+            .join("|")
+        );
+        setSeries(series.series);
+        setProvider(allProviders);
+        setTotalPages(series.totalPages);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error("Error fetching series:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchSeries();
     initFlowbite();
-  });
+  }, []);
 
   const loadMoreSeries = async () => {
     const newPage = page + 1;
@@ -31,6 +50,7 @@ const SerieList: React.FC<Props> = (props) => {
       newPage,
       provider.map((p) => p.provider_id).join("|")
     );
+
     setSeries([...series, ...newSeries.series]);
     setPage(newPage);
   };
@@ -179,6 +199,12 @@ const SerieList: React.FC<Props> = (props) => {
           </div>
         ))}
       </div>
+
+      {loading && (
+        <div className="w-full  flex flex-col justify-center items-center gap-4 my-12">
+          <Loader />
+        </div>
+      )}
       {page <= totalPages && (
         <div className="w-full flex justify-center items-center">
           <button
